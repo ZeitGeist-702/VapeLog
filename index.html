@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>仿生人会梦到电子烟吗</title>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -526,8 +527,8 @@ const emptyCloudSVG = `<svg viewBox="0 0 100 60" fill="none"><path d="M20 45 Q15
 /* ---------- storage ---------- */
 async function loadEntries(){
   try{
-    const res = await window.storage.get('vape-entries', false);
-    entries = res && res.value ? JSON.parse(res.value) : [];
+    const raw = localStorage.getItem('vape-entries');
+    entries = raw ? JSON.parse(raw) : [];
   }catch(e){
     entries = [];
   }
@@ -535,12 +536,12 @@ async function loadEntries(){
 }
 async function persistEntries(){
   try{
-    const res = await window.storage.set('vape-entries', JSON.stringify(entries), false);
-    if(!res){ showToast('保存失败，请重试'); }
+    localStorage.setItem('vape-entries', JSON.stringify(entries));
   }catch(e){
-    showToast('保存失败：' + (e.message || '未知错误'));
+    showToast('保存失败：存储空间可能已满');
   }
 }
+
 
 /* ---------- compress photo ---------- */
 function compressImage(file){
