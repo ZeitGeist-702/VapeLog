@@ -1369,7 +1369,10 @@ const ACHIEVEMENTS = [
   { id:'loyal_brand', title:'[执迷不悟] 你管这叫忠诚，其实是没力气反抗了', icon:'⛓️', desc:'同一品牌测过 7 款以上',
     check:(es)=> brandMax(es)>=7, progress:(es)=> Math.min(brandMax(es),7)+' / 7' },
   { id:'loyal_buyer', title:'[食髓知味] 又来了，又来了', icon:'🔁', desc:'同一款购入次数达到 4 次以上',
-    check:(es)=> es.some(e=>(e.purchaseCount||1)>=4), progress:(es)=> es.some(e=>(e.purchaseCount||1)>=4)?'已达成':'还没有' }
+    check:(es)=> es.some(e=>(e.purchaseCount||1)>=4), progress:(es)=> es.some(e=>(e.purchaseCount||1)>=4)?'已达成':'还没有' },
+  { id:'night_owl', title:'[不眠之夜] 安静得能听见烟雾散开的声音', icon:'🌙', desc:'凌晨 0-5 点之间新增过记录',
+    check:(es)=> es.some(e=>{ const h = new Date(e.createdAt).getHours(); return h>=0 && h<5; }),
+    progress:(es)=> es.some(e=>{ const h = new Date(e.createdAt).getHours(); return h>=0 && h<5; }) ? '已达成' : '还没有' }
 ];
 
 function brandMax(es){
