@@ -259,33 +259,35 @@ select.sort-select{
 [data-theme="dark"] .pod-cartridge{ fill:rgba(220,225,228,0.16) !important; stroke:rgba(220,225,228,0.45) !important; }
 .indicator{ fill:#C9D1CD; transition:fill .2s ease, filter .2s ease; }
 .like-btn.liked .indicator{ fill:#EAF6FF; filter:drop-shadow(0 0 1.5px #BFE3FF) drop-shadow(0 0 3px #8FC7F0); }
-.smoke-wisp{
-  position:absolute;
-  pointer-events:none;
-  overflow:visible;
-}
-.smoke-wisp path{
+.wisp{
   fill:none;
-  stroke:rgba(170,180,178,0.8);
+  stroke:rgba(170,180,178,0.85);
+  stroke-width:0.55;
   stroke-linecap:round;
+  opacity:0;
+  transform-box: fill-box;
+  transform-origin: 0 0;
 }
+.like-btn.smoking .wisp.w1{ animation: wisp-drift-a 1.6s ease-out; }
+.like-btn.smoking .wisp.w2{ animation: wisp-drift-b 1.7s ease-out; animation-delay:.18s; }
+.like-btn.smoking .wisp.w3{ animation: wisp-drift-c 1.8s ease-out; animation-delay:.38s; }
 @keyframes wisp-drift-a{
   0%{ opacity:0; transform:translate(0,0) scale(0.5) rotate(0deg); }
-  12%{ opacity:0.65; }
+  12%{ opacity:0.7; }
   55%{ opacity:0.4; }
-  100%{ opacity:0; transform:translate(-3px,-30px) scale(1.5) rotate(-8deg); }
+  100%{ opacity:0; transform:translate(-1.2px,-10px) scale(1.5) rotate(-8deg); }
 }
 @keyframes wisp-drift-b{
   0%{ opacity:0; transform:translate(0,0) scale(0.5) rotate(0deg); }
-  12%{ opacity:0.6; }
+  12%{ opacity:0.65; }
   55%{ opacity:0.35; }
-  100%{ opacity:0; transform:translate(4px,-34px) scale(1.6) rotate(10deg); }
+  100%{ opacity:0; transform:translate(1.5px,-11.5px) scale(1.6) rotate(10deg); }
 }
 @keyframes wisp-drift-c{
   0%{ opacity:0; transform:translate(0,0) scale(0.5) rotate(0deg); }
-  12%{ opacity:0.55; }
+  12%{ opacity:0.6; }
   55%{ opacity:0.3; }
-  100%{ opacity:0; transform:translate(1px,-38px) scale(1.8) rotate(3deg); }
+  100%{ opacity:0; transform:translate(0.4px,-13px) scale(1.8) rotate(3deg); }
 }
 
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
@@ -865,7 +867,7 @@ loadTheme();
 
 const wispSVG = (opacity=1) => `<svg class="wisp" viewBox="0 0 100 100" style="opacity:${opacity}"><path d="M10 60 Q20 35 45 40 Q55 20 75 30 Q95 35 88 55 Q98 70 80 75 Q60 88 40 75 Q15 78 10 60Z" fill="#6E8C82" opacity="0.18"/></svg>`;
 const meterWispSVG = `<svg class="meter-wisp" viewBox="0 0 24 24"><path d="M3 15 Q5 9 11 10 Q14 4 19 8 Q23 10 20 14 Q24 18 18 19 Q12 22 7 19 Q1 19 3 15Z" fill="#FF6B35"/></svg>`;
-const pipeSVG = `<svg class="device" viewBox="0 0 14 38" xmlns="http://www.w3.org/2000/svg">
+const pipeSVG = `<svg class="device" viewBox="0 0 14 38" xmlns="http://www.w3.org/2000/svg" overflow="visible">
   <defs>
     <linearGradient id="metalGradIdle" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#C7CCCB"/>
@@ -876,6 +878,11 @@ const pipeSVG = `<svg class="device" viewBox="0 0 14 38" xmlns="http://www.w3.or
   <rect x="3.5" y="9.3" width="7" height="28.7" rx="2" fill="url(#metalGradIdle)" stroke="#A8AFAD" stroke-width="0.4"/>
   <path class="pod-cartridge" d="M3.5,9.3 L3.5,5.7 Q3.5,2 7,2 Q10.5,2 10.5,5.7 L10.5,9.3 Z" fill="#2B2826" stroke="#1C1A18" stroke-width="0.4"/>
   <path class="indicator" d="M7 26.6 C4.8 24.6 4.3 22.5 5.5 21.4 C6.4 20.6 7 21.2 7 21.8 C7 21.2 7.6 20.6 8.5 21.4 C9.7 22.5 9.2 24.6 7 26.6 Z"/>
+  <g class="smoke-group" transform="translate(7,2)">
+    <path class="wisp w1" d="M0,0 Q1.5,-3 0,-6 Q-1.5,-9 0.5,-12 Q1.5,-14 0,-16"/>
+    <path class="wisp w2" d="M0,0 Q-1.2,-3 0.8,-5.5 Q2,-8 -0.5,-11 Q-1.5,-13 0.5,-15"/>
+    <path class="wisp w3" d="M0,0 Q1,-2.5 -0.8,-5 Q-2,-7.5 0.3,-10 Q1.5,-12.5 -0.3,-15.5"/>
+  </g>
 </svg>`;
 const emptyCloudSVG = `<svg viewBox="0 0 100 60" fill="none"><path d="M20 45 Q15 28 35 30 Q42 14 60 22 Q80 18 78 35 Q92 38 85 50 Q75 58 55 53 Q35 60 22 52 Q10 50 20 45Z" stroke="#6E8C82" stroke-width="2.5"/></svg>`;
 
@@ -1222,41 +1229,10 @@ async function incrementPurchase(e){
 }
 
 function spawnSmoke(btn){
-  const ns = 'http://www.w3.org/2000/svg';
-  const podEl = btn.querySelector('.pod-cartridge');
-  const deviceSvg = btn.querySelector('svg.device');
-  if(!podEl || !deviceSvg) return;
-  const btnRect = btn.getBoundingClientRect();
-  const btnStyle = getComputedStyle(btn);
-  const padTop = parseFloat(btnStyle.paddingTop) || 0;
-  const padLeft = parseFloat(btnStyle.paddingLeft) || 0;
-  // read the pod cartridge's own real rendered bounding box (most reliable across devices)
-  const podRect = podEl.getBoundingClientRect();
-  const centerX = (podRect.left - btnRect.left - padLeft) + podRect.width/2;
-  const topY = (podRect.top - btnRect.top - padTop);
-
-  const variants = [
-    { d:'M0,0 Q1.5,-3 0,-6 Q-1.5,-9 0.5,-12 Q1.5,-14 0,-16', anim:'wisp-drift-a', delay:0,   dur:1.6 },
-    { d:'M0,0 Q-1.2,-3 0.8,-5.5 Q2,-8 -0.5,-11 Q-1.5,-13 0.5,-15', anim:'wisp-drift-b', delay:180, dur:1.7 },
-    { d:'M0,0 Q1,-2.5 -0.8,-5 Q-2,-7.5 0.3,-10 Q1.5,-12.5 -0.3,-15.5', anim:'wisp-drift-c', delay:380, dur:1.8 }
-  ];
-  variants.forEach(v=>{
-    const svg = document.createElementNS(ns,'svg');
-    svg.setAttribute('class','smoke-wisp');
-    svg.setAttribute('width','10');
-    svg.setAttribute('height','20');
-    svg.setAttribute('viewBox','-5 -17 10 20');
-    const path = document.createElementNS(ns,'path');
-    path.setAttribute('d', v.d);
-    path.setAttribute('stroke-width', (0.9 + Math.random()*0.4).toFixed(2));
-    svg.appendChild(path);
-    svg.style.left = (centerX - 5 + (Math.random()*1.2-0.6)).toFixed(1) + 'px';
-    svg.style.top = (topY - 17).toFixed(1) + 'px';
-    svg.style.animation = `${v.anim} ${v.dur}s ease-out forwards`;
-    svg.style.animationDelay = v.delay + 'ms';
-    btn.appendChild(svg);
-    setTimeout(()=> svg.remove(), v.delay + v.dur*1000 + 100);
-  });
+  btn.classList.remove('smoking');
+  void btn.offsetWidth; // force reflow so the animation can replay even if triggered again quickly
+  btn.classList.add('smoking');
+  setTimeout(()=> btn.classList.remove('smoking'), 2000);
 }
 
 async function toggleLike(id){
@@ -1271,7 +1247,7 @@ async function toggleLike(id){
   if(btn){
     btn.classList.toggle('liked', !hasLiked);
     btn.querySelector('span').textContent = newLikes.length;
-    if(!hasLiked) setTimeout(()=> spawnSmoke(btn), 260);
+    if(!hasLiked) spawnSmoke(btn);
   }
 
   try{
