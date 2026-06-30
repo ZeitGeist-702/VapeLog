@@ -1223,15 +1223,17 @@ async function incrementPurchase(e){
 
 function spawnSmoke(btn){
   const ns = 'http://www.w3.org/2000/svg';
+  const podEl = btn.querySelector('.pod-cartridge');
   const deviceSvg = btn.querySelector('svg.device');
-  if(!deviceSvg) return;
+  if(!podEl || !deviceSvg) return;
   const btnRect = btn.getBoundingClientRect();
-  const devRect = deviceSvg.getBoundingClientRect();
   const btnStyle = getComputedStyle(btn);
   const padTop = parseFloat(btnStyle.paddingTop) || 0;
   const padLeft = parseFloat(btnStyle.paddingLeft) || 0;
-  const centerX = (devRect.left - btnRect.left - padLeft) + devRect.width/2;
-  const topY = (devRect.top - btnRect.top - padTop) + (devRect.height * (2/38));
+  // read the pod cartridge's own real rendered bounding box (most reliable across devices)
+  const podRect = podEl.getBoundingClientRect();
+  const centerX = (podRect.left - btnRect.left - padLeft) + podRect.width/2;
+  const topY = (podRect.top - btnRect.top - padTop);
 
   const variants = [
     { d:'M0,0 Q1.5,-3 0,-6 Q-1.5,-9 0.5,-12 Q1.5,-14 0,-16', anim:'wisp-drift-a', delay:0,   dur:1.6 },
@@ -1269,7 +1271,7 @@ async function toggleLike(id){
   if(btn){
     btn.classList.toggle('liked', !hasLiked);
     btn.querySelector('span').textContent = newLikes.length;
-    if(!hasLiked) spawnSmoke(btn);
+    if(!hasLiked) setTimeout(()=> spawnSmoke(btn), 260);
   }
 
   try{
