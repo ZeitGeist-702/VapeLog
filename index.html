@@ -256,6 +256,7 @@ select.sort-select{
 .like-btn svg{ width:17px; height:46px; flex:none; overflow:visible; }
 .pod-cartridge{ opacity:0; transform:translateY(-4px); transition:opacity .15s ease, transform .25s cubic-bezier(.2,.8,.3,1.3); }
 .like-btn.liked .pod-cartridge{ opacity:1; transform:translateY(0); }
+[data-theme="dark"] .pod-cartridge{ fill:rgba(220,225,228,0.16) !important; stroke:rgba(220,225,228,0.45) !important; }
 .indicator{ fill:#C9D1CD; transition:fill .2s ease, filter .2s ease; }
 .like-btn.liked .indicator{ fill:#EAF6FF; filter:drop-shadow(0 0 1.5px #BFE3FF) drop-shadow(0 0 3px #8FC7F0); }
 .smoke-wisp{
@@ -1247,7 +1248,7 @@ function spawnSmoke(btn){
     path.setAttribute('d', v.d);
     path.setAttribute('stroke-width', (0.9 + Math.random()*0.4).toFixed(2));
     svg.appendChild(path);
-    svg.style.left = (centerX - 5 + 3 + (Math.random()*1.2-0.6)).toFixed(1) + 'px';
+    svg.style.left = (centerX - 5 + (Math.random()*1.2-0.6)).toFixed(1) + 'px';
     svg.style.top = (topY - 17).toFixed(1) + 'px';
     svg.style.animation = `${v.anim} ${v.dur}s ease-out forwards`;
     svg.style.animationDelay = v.delay + 'ms';
