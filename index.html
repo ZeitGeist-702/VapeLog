@@ -258,17 +258,33 @@ select.sort-select{
 .like-btn.liked .pod-cartridge{ opacity:1; transform:translateY(0); }
 .indicator{ fill:#C9D1CD; transition:fill .2s ease, filter .2s ease; }
 .like-btn.liked .indicator{ fill:#EAF6FF; filter:drop-shadow(0 0 1.5px #BFE3FF) drop-shadow(0 0 3px #8FC7F0); }
-.smoke-puff{
+.smoke-wisp{
   position:absolute;
-  width:4px; height:4px;
-  border-radius:50%;
-  background:radial-gradient(circle, rgba(180,190,188,0.85), rgba(180,190,188,0));
   pointer-events:none;
-  animation: smoke-rise 1.4s ease-out forwards;
+  overflow:visible;
 }
-@keyframes smoke-rise{
-  0%{ transform:translate(0,0) scale(0.6); opacity:0.75; }
-  100%{ transform:translate(var(--dx,6px), -24px) scale(2.4); opacity:0; }
+.smoke-wisp path{
+  fill:none;
+  stroke:rgba(170,180,178,0.8);
+  stroke-linecap:round;
+}
+@keyframes wisp-drift-a{
+  0%{ opacity:0; transform:translate(0,0) scale(0.5) rotate(0deg); }
+  12%{ opacity:0.65; }
+  55%{ opacity:0.4; }
+  100%{ opacity:0; transform:translate(-3px,-30px) scale(1.5) rotate(-8deg); }
+}
+@keyframes wisp-drift-b{
+  0%{ opacity:0; transform:translate(0,0) scale(0.5) rotate(0deg); }
+  12%{ opacity:0.6; }
+  55%{ opacity:0.35; }
+  100%{ opacity:0; transform:translate(4px,-34px) scale(1.6) rotate(10deg); }
+}
+@keyframes wisp-drift-c{
+  0%{ opacity:0; transform:translate(0,0) scale(0.5) rotate(0deg); }
+  12%{ opacity:0.55; }
+  55%{ opacity:0.3; }
+  100%{ opacity:0; transform:translate(1px,-38px) scale(1.8) rotate(3deg); }
 }
 
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
@@ -848,7 +864,7 @@ loadTheme();
 
 const wispSVG = (opacity=1) => `<svg class="wisp" viewBox="0 0 100 100" style="opacity:${opacity}"><path d="M10 60 Q20 35 45 40 Q55 20 75 30 Q95 35 88 55 Q98 70 80 75 Q60 88 40 75 Q15 78 10 60Z" fill="#6E8C82" opacity="0.18"/></svg>`;
 const meterWispSVG = `<svg class="meter-wisp" viewBox="0 0 24 24"><path d="M3 15 Q5 9 11 10 Q14 4 19 8 Q23 10 20 14 Q24 18 18 19 Q12 22 7 19 Q1 19 3 15Z" fill="#FF6B35"/></svg>`;
-const pipeSVG = `<svg viewBox="0 0 14 38" xmlns="http://www.w3.org/2000/svg">
+const pipeSVG = `<svg class="device" viewBox="0 0 14 38" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="metalGradIdle" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#C7CCCB"/>
@@ -1205,17 +1221,39 @@ async function incrementPurchase(e){
 }
 
 function spawnSmoke(btn){
-  for(let i=0;i<5;i++){
-    const puff = document.createElement('div');
-    puff.className = 'smoke-puff';
-    const dx = (Math.random()*14-7).toFixed(1);
-    puff.style.setProperty('--dx', dx+'px');
-    puff.style.left = (5 + Math.random()*4) + 'px';
-    puff.style.top = (1 - Math.random()*1.5) + 'px';
-    puff.style.animationDelay = (i*150) + 'ms';
-    btn.appendChild(puff);
-    setTimeout(()=> puff.remove(), 1500);
-  }
+  const ns = 'http://www.w3.org/2000/svg';
+  const deviceSvg = btn.querySelector('svg.device');
+  if(!deviceSvg) return;
+  const btnRect = btn.getBoundingClientRect();
+  const devRect = deviceSvg.getBoundingClientRect();
+  const btnStyle = getComputedStyle(btn);
+  const padTop = parseFloat(btnStyle.paddingTop) || 0;
+  const padLeft = parseFloat(btnStyle.paddingLeft) || 0;
+  const centerX = (devRect.left - btnRect.left - padLeft) + devRect.width/2;
+  const topY = (devRect.top - btnRect.top - padTop) + (devRect.height * (2/38));
+
+  const variants = [
+    { d:'M0,0 Q1.5,-3 0,-6 Q-1.5,-9 0.5,-12 Q1.5,-14 0,-16', anim:'wisp-drift-a', delay:0,   dur:1.6 },
+    { d:'M0,0 Q-1.2,-3 0.8,-5.5 Q2,-8 -0.5,-11 Q-1.5,-13 0.5,-15', anim:'wisp-drift-b', delay:180, dur:1.7 },
+    { d:'M0,0 Q1,-2.5 -0.8,-5 Q-2,-7.5 0.3,-10 Q1.5,-12.5 -0.3,-15.5', anim:'wisp-drift-c', delay:380, dur:1.8 }
+  ];
+  variants.forEach(v=>{
+    const svg = document.createElementNS(ns,'svg');
+    svg.setAttribute('class','smoke-wisp');
+    svg.setAttribute('width','10');
+    svg.setAttribute('height','20');
+    svg.setAttribute('viewBox','-5 -17 10 20');
+    const path = document.createElementNS(ns,'path');
+    path.setAttribute('d', v.d);
+    path.setAttribute('stroke-width', (0.9 + Math.random()*0.4).toFixed(2));
+    svg.appendChild(path);
+    svg.style.left = (centerX - 5 + 3 + (Math.random()*1.2-0.6)).toFixed(1) + 'px';
+    svg.style.top = (topY - 17).toFixed(1) + 'px';
+    svg.style.animation = `${v.anim} ${v.dur}s ease-out forwards`;
+    svg.style.animationDelay = v.delay + 'ms';
+    btn.appendChild(svg);
+    setTimeout(()=> svg.remove(), v.delay + v.dur*1000 + 100);
+  });
 }
 
 async function toggleLike(id){
