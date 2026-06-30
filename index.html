@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -23,9 +23,30 @@
   --sage:#6E8C82;
   --sage-soft:#DCE6E2;
   --danger:#C24B3F;
+  --input-bg:#fff;
   --radius:18px;
   --shadow: 0 1px 2px rgba(27,36,34,0.04), 0 8px 24px -8px rgba(27,36,34,0.10);
 }
+
+[data-theme="dark"]{
+  --bg:#14181A;
+  --paper:#1E2422;
+  --paper-soft:#262E2B;
+  --ink:#ECF1EE;
+  --muted:#909C98;
+  --line:#323C39;
+  --ember:#FF7A47;
+  --ember-deep:#FF6B35;
+  --amber:#E0B25E;
+  --sage:#86AA9F;
+  --sage-soft:#27352F;
+  --danger:#E0685A;
+  --input-bg:#222A27;
+  --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 8px 24px -8px rgba(0,0,0,0.45);
+}
+[data-theme="dark"] body{background:var(--bg);}
+[data-theme="dark"] .overlay{background:rgba(0,0,0,0.55);}
+[data-theme="dark"] .panel{box-shadow:0 24px 60px -10px rgba(0,0,0,0.55);}
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -225,6 +246,31 @@ select.sort-select{
   display:inline-block;margin-top:6px;margin-left:6px;
 }
 
+.like-btn{
+  display:inline-flex; align-items:center; gap:10px;
+  background:none; border:none; cursor:pointer;
+  padding:6px 4px; position:relative;
+  font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600;
+  color:var(--muted);
+}
+.like-btn svg{ width:17px; height:46px; flex:none; overflow:visible; }
+.pod-cartridge{ opacity:0; transform:translateY(-4px); transition:opacity .15s ease, transform .25s cubic-bezier(.2,.8,.3,1.3); }
+.like-btn.liked .pod-cartridge{ opacity:1; transform:translateY(0); }
+.indicator{ fill:#C9D1CD; transition:fill .2s ease, filter .2s ease; }
+.like-btn.liked .indicator{ fill:#EAF6FF; filter:drop-shadow(0 0 1.5px #BFE3FF) drop-shadow(0 0 3px #8FC7F0); }
+.smoke-puff{
+  position:absolute;
+  width:4px; height:4px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(180,190,188,0.85), rgba(180,190,188,0));
+  pointer-events:none;
+  animation: smoke-rise 1.4s ease-out forwards;
+}
+@keyframes smoke-rise{
+  0%{ transform:translate(0,0) scale(0.6); opacity:0.75; }
+  100%{ transform:translate(var(--dx,6px), -24px) scale(2.4); opacity:0; }
+}
+
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
 .chip{
   font-size:11px;
@@ -357,7 +403,7 @@ select.sort-select{
   padding:10px 12px;
   border-radius:10px;
   border:1px solid var(--line);
-  background:#fff;
+  background:var(--input-bg);
   font-family:'Inter',sans-serif;
   font-size:14px;
   color:var(--ink);
@@ -407,28 +453,147 @@ select.sort-select{
 .badge-progress{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--sage);}
 .badge-card.unlocked .badge-progress{color:#9C7A26;font-weight:700;}
 
-.recap-card{
-  background:linear-gradient(135deg, var(--amber), var(--ember));
+/* ---- achievement unlock modal (cyberpunk glass, echoes recap card) ---- */
+.achv-modal-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(8,6,10,0);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  transition:background .25s ease;
+}
+.achv-modal-overlay.show{background:rgba(8,6,10,0.6);backdrop-filter:blur(2px);}
+.achv-modal-card{
+  position:relative;
+  width:100%;max-width:320px;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(75,20,55,0.32), transparent 55%),
+    radial-gradient(circle at 85% 85%, rgba(20,55,42,0.32), transparent 55%),
+    #0C0810;
+  color:#F0EAEE;
+  border:1px solid rgba(255,255,255,0.12);
   border-radius:20px;
-  padding:26px 20px 22px;
-  color:#fff;
+  padding:28px 24px 24px;
   text-align:center;
+  overflow:hidden;
+  box-shadow:
+    0 1px 1px rgba(255,255,255,0.08) inset,
+    0 30px 70px -15px rgba(0,0,0,0.55),
+    0 0 50px -10px rgba(75,20,55,0.5),
+    0 0 50px -10px rgba(20,55,42,0.4);
+  transform:scale(0.85) translateY(14px);
+  opacity:0;
+  transition:transform .32s cubic-bezier(.2,.9,.3,1.3), opacity .25s ease;
+}
+.achv-modal-overlay.show .achv-modal-card{transform:scale(1) translateY(0);opacity:1;}
+.achv-modal-eyebrow{
+  position:relative;z-index:2;
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:0.16em;text-transform:uppercase;color:#B06490;
+  margin-bottom:14px;
+}
+.achv-modal-title{
+  position:relative;z-index:2;
+  margin-bottom:10px;
+}
+.achv-modal-title-tag{
+  display:block;
+  font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;
+  letter-spacing:0.01em;color:#F0EAEE;margin-bottom:6px;
+}
+.achv-modal-title-main{
+  display:block;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  line-height:1.5;color:#D8E0D8;
+}
+.achv-modal-desc{
+  position:relative;z-index:2;
+  font-size:11.5px;font-style:italic;color:#90A097;line-height:1.6;margin-bottom:22px;
+}
+.achv-modal-btn{
+  position:relative;z-index:2;
+  background:linear-gradient(90deg, var(--ember), var(--ember-deep));
+  color:#fff;border:none;
+  border-radius:999px;padding:11px 28px;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:14px;
+  cursor:pointer;
+  box-shadow:0 8px 20px -6px rgba(255,107,53,0.5);
+}
+.achv-modal-btn:hover{filter:brightness(1.08);}
+
+.recap-card{
+  background:
+    radial-gradient(circle at 20% 20%, rgba(75,20,55,0.13), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(20,55,42,0.20), transparent 50%),
+    #0C0810;
+  border-radius:18px;
+  padding:26px 22px 22px;
+  color:#F0EAEE;
+  text-align:left;
   position:relative;
   overflow:hidden;
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 1px 1px rgba(255,255,255,0.08) inset,
+    0 0 50px -10px rgba(75,20,55,0.5),
+    0 0 50px -10px rgba(20,55,42,0.4);
 }
+.recap-grid-noise{
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(75,20,55,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(75,20,55,0.06) 1px, transparent 1px);
+  background-size:18px 18px;
+  pointer-events:none;
+}
+.recap-scanlines{
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, transparent 1px, transparent 3px);
+  pointer-events:none;
+}
+.recap-bracket{ position:absolute; width:16px; height:16px; border-color:rgba(190,195,200,0.55); }
+.recap-bracket.tl{ top:10px; left:10px; border-top:2px solid; border-left:2px solid; }
+.recap-bracket.br{ bottom:10px; right:10px; border-bottom:2px solid; border-right:2px solid; }
 .recap-eyebrow{
-  font-family:'IBM Plex Mono',monospace;font-size:11px;
-  letter-spacing:0.12em;text-transform:uppercase;opacity:0.85;margin-bottom:6px;
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:0.16em;text-transform:uppercase;color:#B06490;margin-bottom:8px;
+  position:relative;
 }
-.recap-big-num{font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;line-height:1;}
-.recap-big-label{font-size:13px;opacity:0.9;margin-bottom:18px;}
-.recap-stats-row{display:flex;justify-content:space-around;margin-bottom:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.32);}
-.recap-stat-num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;}
-.recap-stat-lbl{font-size:10.5px;opacity:0.85;margin-top:2px;}
-.recap-top{font-size:13px;margin-bottom:12px;opacity:0.95;}
+.recap-title-wrap{ position:relative; margin-bottom:14px; }
+.recap-title{
+  font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;
+  color:#F0EAEE;line-height:1.3;position:relative;z-index:2;
+}
+.recap-divider{
+  height:1px;
+  background:linear-gradient(90deg, rgba(75,20,55,0.7), rgba(190,195,200,0.3), rgba(20,55,42,0.55), transparent);
+  margin:14px 0;
+}
+.recap-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:13px;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  color:#D8E0D8;
+  position:relative;
+}
+.recap-row:last-of-type{border-bottom:none;}
+.recap-row-label{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7A9488;
+  text-transform:uppercase;letter-spacing:0.05em;
+}
+.recap-row-value{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15.5px;color:#DCEFE4;
+  text-shadow:0 0 10px rgba(20,55,42,0.5);
+}
 .recap-quip{
-  font-size:13px;background:rgba(255,255,255,0.18);
-  border-radius:10px;padding:10px 14px;line-height:1.5;
+  font-size:13px;font-style:italic;color:#D8E0D8;line-height:1.6;
+  padding:12px 14px;margin-top:14px;
+  background:rgba(20,55,42,0.1);
+  border:1px solid rgba(20,55,42,0.4);
+  border-radius:8px;
+}
+.recap-quip .tag{
+  font-family:'IBM Plex Mono',monospace;font-style:normal;font-weight:700;
+  font-size:11px;color:#5C7A6A;margin-right:6px;
 }
 
 .color-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
@@ -451,7 +616,7 @@ select.sort-select{
 .dot-btn{
   width:26px;height:26px;border-radius:50%;
   border:1.5px solid var(--line);
-  background:#fff;
+  background:var(--input-bg);
   cursor:pointer;
 }
 .dot-btn.filled{background:var(--amber);border-color:var(--amber);}
@@ -467,7 +632,7 @@ select.sort-select{
 .segmented{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
 .segmented button{
   flex:1;padding:9px 0;
-  background:#fff;border:none;
+  background:var(--input-bg);border:none;
   font-family:'Inter',sans-serif;font-size:13.5px;
   cursor:pointer;color:var(--muted);
   border-right:1px solid var(--line);
@@ -570,9 +735,10 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
+      <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
       <div class="icon-btn" id="recapBtn" title="测评回顾" style="font-size:15px;">📊</div>
       <div class="icon-btn" id="achievementsBtn" title="成就墙" style="font-size:16px;">🏆</div>
       <div class="icon-btn" id="settingsBtn" title="设置">
@@ -657,8 +823,43 @@ function copyToClipboard(text){
   }
 }
 
+/* ---------- dark mode ---------- */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeBtn');
+  if(btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+function loadTheme(){
+  let theme = 'light';
+  try{
+    const saved = localStorage.getItem('vape-theme');
+    if(saved){ theme = saved; }
+    else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){ theme = 'dark'; }
+  }catch(e){}
+  applyTheme(theme);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  try{ localStorage.setItem('vape-theme', next); }catch(e){}
+  applyTheme(next);
+}
+loadTheme();
+
 const wispSVG = (opacity=1) => `<svg class="wisp" viewBox="0 0 100 100" style="opacity:${opacity}"><path d="M10 60 Q20 35 45 40 Q55 20 75 30 Q95 35 88 55 Q98 70 80 75 Q60 88 40 75 Q15 78 10 60Z" fill="#6E8C82" opacity="0.18"/></svg>`;
 const meterWispSVG = `<svg class="meter-wisp" viewBox="0 0 24 24"><path d="M3 15 Q5 9 11 10 Q14 4 19 8 Q23 10 20 14 Q24 18 18 19 Q12 22 7 19 Q1 19 3 15Z" fill="#FF6B35"/></svg>`;
+const pipeSVG = `<svg viewBox="0 0 14 38" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="metalGradIdle" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C7CCCB"/>
+      <stop offset="40%" stop-color="#E4E8E7"/>
+      <stop offset="100%" stop-color="#B8BDBC"/>
+    </linearGradient>
+  </defs>
+  <rect x="3.5" y="9.3" width="7" height="28.7" rx="2" fill="url(#metalGradIdle)" stroke="#A8AFAD" stroke-width="0.4"/>
+  <path class="pod-cartridge" d="M3.5,9.3 L3.5,5.7 Q3.5,2 7,2 Q10.5,2 10.5,5.7 L10.5,9.3 Z" fill="#2B2826" stroke="#1C1A18" stroke-width="0.4"/>
+  <path class="indicator" d="M7 26.6 C4.8 24.6 4.3 22.5 5.5 21.4 C6.4 20.6 7 21.2 7 21.8 C7 21.2 7.6 20.6 8.5 21.4 C9.7 22.5 9.2 24.6 7 26.6 Z"/>
+</svg>`;
 const emptyCloudSVG = `<svg viewBox="0 0 100 60" fill="none"><path d="M20 45 Q15 28 35 30 Q42 14 60 22 Q80 18 78 35 Q92 38 85 50 Q75 58 55 53 Q35 60 22 52 Q10 50 20 45Z" stroke="#6E8C82" stroke-width="2.5"/></svg>`;
 
 /* ---------- local config (device settings only: nickname + room codes) ---------- */
@@ -692,6 +893,9 @@ async function loadEntries(){
       author: row.author,
       createdAt: new Date(row.created_at).getTime()
     }));
+    if(activeRoom === 'personal'){
+      checkAndShowNewAchievements(entries);
+    }
   }catch(e){
     showToast('加载失败：' + (e.message || '网络问题'));
     entries = [];
@@ -759,10 +963,14 @@ function renderStats(){
     const d = new Date(e.dateTried || e.createdAt);
     return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
   }).length;
+  const memberCount = activeRoom === 'shared'
+    ? new Set(entries.map(e=>e.author).filter(Boolean)).size
+    : null;
   statStrip.innerHTML = `
     <div class="stat"><span class="num">${count}</span><span class="lbl">已记录款数</span></div>
     <div class="stat"><span class="num">${avg}</span><span class="lbl">平均评分</span></div>
     <div class="stat"><span class="num">${monthCount}</span><span class="lbl">本月新增</span></div>
+    ${memberCount !== null ? `<div class="stat"><span class="num">${memberCount}</span><span class="lbl">位成员</span></div>` : ''}
   `;
 }
 
@@ -896,7 +1104,18 @@ function cardHTML(e){
         <div class="meter-fill" style="width:${pct}%">${meterWispSVG}</div>
       </div>
     </div>
+    ${activeRoom==='shared' ? likeButtonHTML(e) : ''}
   </div>`;
+}
+
+function likeButtonHTML(e){
+  const likes = e.likes || [];
+  const liked = likes.includes(config.nickname);
+  return `
+    <button type="button" class="like-btn ${liked?'liked':''}" data-like-id="${e.id}" onclick="event.stopPropagation(); toggleLike('${e.id}')">
+      ${pipeSVG}
+      <span>${likes.length}</span>
+    </button>`;
 }
 
 /* ---------- detail panel ---------- */
@@ -915,6 +1134,7 @@ function openDetailPanel(id){
       <div class="close-btn" id="closePanel">✕</div>
     </div>
     ${activeRoom==='shared' ? `<div class="author-tag" style="margin-bottom:14px;">@ ${escapeHtml(e.author||'匿名')} 添加</div>` : ''}
+    ${activeRoom==='shared' ? `<div style="margin-bottom:14px;">${likeButtonHTML(e)}</div>` : ''}
     ${e.photo ? `<img class="detail-photo" src="${e.photo}">` : ''}
     <div class="detail-score-block">
       <div class="meter-score" style="font-size:30px;">${e.score.toFixed(1)}</div>
@@ -981,6 +1201,47 @@ async function incrementPurchase(e){
     openDetailPanel(e.id);
   }catch(err){
     showToast('更新失败：' + (err.message || '网络问题'));
+  }
+}
+
+function spawnSmoke(btn){
+  for(let i=0;i<5;i++){
+    const puff = document.createElement('div');
+    puff.className = 'smoke-puff';
+    const dx = (Math.random()*14-7).toFixed(1);
+    puff.style.setProperty('--dx', dx+'px');
+    puff.style.left = (5 + Math.random()*4) + 'px';
+    puff.style.top = (1 - Math.random()*1.5) + 'px';
+    puff.style.animationDelay = (i*150) + 'ms';
+    btn.appendChild(puff);
+    setTimeout(()=> puff.remove(), 1500);
+  }
+}
+
+async function toggleLike(id){
+  const e = entries.find(x=>String(x.id)===String(id));
+  if(!e || !config.nickname) return;
+  const likes = e.likes || [];
+  const hasLiked = likes.includes(config.nickname);
+  const newLikes = hasLiked ? likes.filter(n=>n!==config.nickname) : [...likes, config.nickname];
+  const entryData = { ...entryToData(e), likes: newLikes };
+
+  const btn = document.querySelector(`[data-like-id="${id}"]`);
+  if(btn){
+    btn.classList.toggle('liked', !hasLiked);
+    btn.querySelector('span').textContent = newLikes.length;
+    if(!hasLiked) spawnSmoke(btn);
+  }
+
+  try{
+    const updated = await updateEntryCloud(id, entryData);
+    entries = entries.map(x => String(x.id)===String(id) ? updated : x);
+  }catch(err){
+    if(btn){
+      btn.classList.toggle('liked', hasLiked);
+      btn.querySelector('span').textContent = likes.length;
+    }
+    showToast('点赞失败：' + (err.message || '网络问题'));
   }
 }
 
@@ -1213,6 +1474,9 @@ function renderForm(data, title){
       }
       closePanel();
       render();
+      if(activeRoom === 'personal'){
+        checkAndShowNewAchievements(entries);
+      }
       showToast(editingId ? '已保存修改' : '已添加新记录');
     }catch(err){
       showToast('保存失败：' + (err.message || '网络问题'));
@@ -1338,16 +1602,21 @@ function renderRecapPanel(personalEntries, range){
       <button type="button" data-range="all" class="${range==='all'?'active':''}">全部</button>
     </div>
     <div class="recap-card" id="recapCard">
-      <div class="recap-eyebrow">${rangeLabel}回顾</div>
-      <div class="recap-big-num">${stats.count}</div>
-      <div class="recap-big-label">款测评</div>
-      <div class="recap-stats-row">
-        <div class="recap-stat"><div class="recap-stat-num">${stats.count ? stats.avg.toFixed(1) : '–'}</div><div class="recap-stat-lbl">平均评分</div></div>
-        <div class="recap-stat"><div class="recap-stat-num">${stats.rebuyYes}</div><div class="recap-stat-lbl">会回购</div></div>
-        <div class="recap-stat"><div class="recap-stat-num">${stats.topTag ? '#'+escapeHtml(stats.topTag) : '—'}</div><div class="recap-stat-lbl">最常用标签</div></div>
+      <div class="recap-grid-noise"></div>
+      <div class="recap-scanlines"></div>
+      <div class="recap-bracket tl"></div>
+      <div class="recap-bracket br"></div>
+      <div class="recap-eyebrow">质 / 检 报 告 · ${rangeLabel}</div>
+      <div class="recap-title-wrap">
+        <div class="recap-title">舌头记下的事</div>
       </div>
-      ${stats.top ? `<div class="recap-top">本期最高分：<strong>${escapeHtml(stats.top.name||'未命名')}</strong>（${Number(stats.top.score).toFixed(1)} 分）</div>` : ''}
-      <div class="recap-quip">${escapeHtml(generateQuip(stats))}</div>
+      <div class="recap-divider"></div>
+      <div class="recap-row"><span class="recap-row-label">测评总数</span><span class="recap-row-value">${stats.count} 款</span></div>
+      <div class="recap-row"><span class="recap-row-label">平均评分</span><span class="recap-row-value">${stats.count ? stats.avg.toFixed(1) : '–'}</span></div>
+      <div class="recap-row"><span class="recap-row-label">最高分款</span><span class="recap-row-value">${stats.top ? escapeHtml(stats.top.name||'未命名')+' '+Number(stats.top.score).toFixed(1) : '—'}</span></div>
+      <div class="recap-row"><span class="recap-row-label">最常用标签</span><span class="recap-row-value">${stats.topTag ? '#'+escapeHtml(stats.topTag) : '—'}</span></div>
+      <div class="recap-row"><span class="recap-row-label">会回购</span><span class="recap-row-value">${stats.rebuyYes} 款</span></div>
+      <div class="recap-quip"><span class="tag">[内陆帝国]</span>${escapeHtml(generateQuip(stats))}</div>
     </div>
     <div class="hint-text" style="margin-top:10px;">截图保存这张卡片，发给朋友炫耀一下也行～</div>
   `;
@@ -1359,18 +1628,25 @@ function renderRecapPanel(personalEntries, range){
 }
 const ACHIEVEMENTS = [
   { id:'starter', title:'[博学多闻] 你的舌头开始记笔记了', icon:'📔', desc:'测评满 10 款',
+    flavor:'味觉系统已正式建档。从今往后，你的每一口都会被记下，无法假装没发生过。',
     check:(es)=> es.length>=10, progress:(es)=> Math.min(es.length,10)+' / 10' },
   { id:'foodie', title:'[天人感应] おめでとう👏，おめでとう👏，おめでとう👏', icon:'🎉', desc:'测评满 27 款',
+    flavor:'某种神秘的共振发生了。你和你的烟雾之间，已经不只是消费关系那么简单。',
     check:(es)=> es.length>=27, progress:(es)=> Math.min(es.length,27)+' / 27' },
   { id:'perfectionist', title:'[内陆帝国] 你尝一口就知道是神物，果然没错', icon:'🌀', desc:'给过一次 10 分满分',
+    flavor:'直觉先于理性抵达。你打出满分的那一刻，整个房间都安静了一瞬。',
     check:(es)=> es.some(e=>Number(e.score)>=10), progress:(es)=> es.some(e=>Number(e.score)>=10)?'已达成':'还没有' },
   { id:'picky', title:'[古老的爬虫脑] 喉咽本能后退，理智还没反应过来', icon:'🦎', desc:'给过一次 3 分以下',
+    flavor:'你的身体比你先做出了判断，并且毫不留情地把分数打了下去。',
     check:(es)=> es.some(e=>Number(e.score)<3), progress:(es)=> es.some(e=>Number(e.score)<3)?'已达成':'还没有' },
   { id:'loyal_brand', title:'[执迷不悟] 你管这叫忠诚，其实是没力气反抗了', icon:'⛓️', desc:'同一品牌测过 7 款以上',
+    flavor:'你以为自己还在挑选，其实早就被一个名字收编了。这不是爱，这是惯性。',
     check:(es)=> brandMax(es)>=7, progress:(es)=> Math.min(brandMax(es),7)+' / 7' },
   { id:'loyal_buyer', title:'[食髓知味] 又来了，又来了', icon:'🔁', desc:'同一款购入次数达到 4 次以上',
+    flavor:'你试过别的，也回来了。这种循环本身，大概就是答案。',
     check:(es)=> es.some(e=>(e.purchaseCount||1)>=4), progress:(es)=> es.some(e=>(e.purchaseCount||1)>=4)?'已达成':'还没有' },
   { id:'night_owl', title:'[不眠之夜] 安静得能听见烟雾散开的声音', icon:'🌙', desc:'凌晨 0-5 点之间新增过记录',
+    flavor:'整座城市都睡了，只有你和屏幕的微光还醒着，认认真真地记下这一口。',
     check:(es)=> es.some(e=>{ const h = new Date(e.createdAt).getHours(); return h>=0 && h<5; }),
     progress:(es)=> es.some(e=>{ const h = new Date(e.createdAt).getHours(); return h>=0 && h<5; }) ? '已达成' : '还没有' }
 ];
@@ -1383,6 +1659,74 @@ function brandMax(es){
   });
   const vals = Object.values(counts);
   return vals.length ? Math.max(...vals) : 0;
+}
+
+/* ---------- achievement unlock detection & celebration modal ---------- */
+let achvQueue = [];
+let achvShowing = false;
+
+function getUnlockedAchvIds(){
+  try{
+    const raw = localStorage.getItem('vape-unlocked-achv');
+    return raw === null ? null : JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function saveUnlockedAchvIds(ids){
+  try{ localStorage.setItem('vape-unlocked-achv', JSON.stringify(ids)); }catch(e){}
+}
+
+function checkAndShowNewAchievements(personalEntries){
+  const currentIds = ACHIEVEMENTS.filter(a=>a.check(personalEntries)).map(a=>a.id);
+  const stored = getUnlockedAchvIds();
+  if(stored === null){
+    // first time using this feature: take current state as baseline, no popups
+    saveUnlockedAchvIds(currentIds);
+    return;
+  }
+  const newIds = currentIds.filter(id => !stored.includes(id));
+  if(newIds.length){
+    saveUnlockedAchvIds(currentIds);
+    newIds.forEach(id => achvQueue.push(ACHIEVEMENTS.find(a=>a.id===id)));
+    showNextAchvModal();
+  }
+}
+
+function formatAchvTitle(title){
+  const m = title.match(/^(\[[^\]]+\])\s*(.*)$/);
+  if(!m) return escapeHtml(title);
+  return `<span class="achv-modal-title-tag">${escapeHtml(m[1])}</span><span class="achv-modal-title-main">${escapeHtml(m[2])}</span>`;
+}
+
+function showNextAchvModal(){
+  if(achvShowing || !achvQueue.length) return;
+  const a = achvQueue.shift();
+  achvShowing = true;
+  const modal = document.createElement('div');
+  modal.className = 'achv-modal-overlay';
+  modal.innerHTML = `
+    <div class="achv-modal-card">
+      <div class="recap-grid-noise"></div>
+      <div class="recap-scanlines"></div>
+      <div class="recap-bracket tl"></div>
+      <div class="recap-bracket br"></div>
+      <div class="achv-modal-eyebrow">成 就 解 锁</div>
+      <div class="achv-modal-title">${formatAchvTitle(a.title)}</div>
+      <div class="achv-modal-desc">${a.flavor || ''}</div>
+      <button class="achv-modal-btn" type="button">好耶</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  requestAnimationFrame(()=> modal.classList.add('show'));
+  const close = ()=>{
+    modal.classList.remove('show');
+    setTimeout(()=>{
+      modal.remove();
+      achvShowing = false;
+      showNextAchvModal();
+    }, 240);
+  };
+  modal.querySelector('.achv-modal-btn').addEventListener('click', close);
+  modal.addEventListener('click', e=>{ if(e.target === modal) close(); });
 }
 
 async function getPersonalEntriesForAchievements(){
@@ -1425,6 +1769,7 @@ async function openAchievementsPanel(){
 
 /* ---------- events ---------- */
 document.getElementById('addBtn').addEventListener('click', openAddPanel);
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
 document.getElementById('searchInput').addEventListener('input', render);
 document.getElementById('sortSelect').addEventListener('change', render);
 document.getElementById('settingsBtn').addEventListener('click', openSettingsPanel);
