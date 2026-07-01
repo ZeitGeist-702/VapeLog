@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -729,6 +729,35 @@ select.sort-select{
 }
 .detail-meta-grid div span{display:block;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:2px;}
 
+.purchase-section{margin-bottom:16px;}
+.purchase-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.purchase-section-head span{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.03em;}
+.mini-btn{
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+  background:var(--paper-soft);border:1px solid var(--line);border-radius:8px;
+  padding:5px 10px;cursor:pointer;color:var(--ink);
+}
+.mini-btn:hover{border-color:var(--sage);}
+.purchase-row{
+  display:flex;align-items:center;gap:8px;
+  background:var(--paper-soft);border-radius:10px;
+  padding:8px 10px;margin-bottom:6px;font-size:12.5px;
+}
+.purchase-row input[type="date"]{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;
+  border:1px solid var(--line);border-radius:6px;
+  background:var(--paper);color:var(--ink);
+  padding:4px 6px;flex:1;min-width:0;
+}
+.purchase-arrow{color:var(--muted);flex:none;}
+
+.grave-list{display:flex;flex-direction:column;gap:10px;}
+.grave-card{background:var(--paper-soft);border-radius:14px;padding:14px 16px;}
+.grave-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:2px;}
+.grave-meta{font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
+.grave-eulogy{font-size:13px;line-height:1.6;color:var(--ink);}
+.grave-eulogy .eulogy-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-right:6px;font-weight:700;}
+
 .toast{
   position:fixed;bottom:24px;left:50%;
   transform:translateX(-50%) translateY(20px);
@@ -758,11 +787,12 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
       <div class="icon-btn" id="recapBtn" title="测评回顾" style="font-size:15px;">📊</div>
+      <div class="icon-btn" id="graveyardBtn" title="纪念馆" style="font-size:15px;">🪦</div>
       <div class="icon-btn" id="achievementsBtn" title="成就墙" style="font-size:16px;">🏆</div>
       <div class="icon-btn" id="settingsBtn" title="设置">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -889,6 +919,139 @@ const pipeSVG = `<svg class="device" viewBox="0 0 14 38" xmlns="http://www.w3.or
   </g>
 </svg>`;
 const emptyCloudSVG = `<svg viewBox="0 0 100 60" fill="none"><path d="M20 45 Q15 28 35 30 Q42 14 60 22 Q80 18 78 35 Q92 38 85 50 Q75 58 55 53 Q35 60 22 52 Q10 50 20 45Z" stroke="#6E8C82" stroke-width="2.5"/></svg>`;
+
+/* ---------- vapor fingerprint (5-axis mist radar) ---------- */
+function fingerprintSVG(e, size, showLabels){
+  const vals = [e.subSweet||0, e.subIce||0, e.subVapor||0, e.subSmooth||0, e.subThroat||0];
+  const labels = ['口味','冰感','烟雾量','顺滑度','击喉感'];
+  const cx = size/2, cy = size/2, maxR = size*0.40;
+  const ANGLES = [-90,-18,54,126,198].map(d=>d*Math.PI/180);
+  const pt = (r,i) => `${(cx+r*Math.cos(ANGLES[i])).toFixed(1)},${(cy+r*Math.sin(ANGLES[i])).toFixed(1)}`;
+  const ring = r => ANGLES.map((_,i)=>pt(r,i)).join(' ');
+  const shapePts = vals.map((v,i)=> pt(maxR*(Math.max(0,Math.min(5,v))/5), i)).join(' ');
+  const labelsSVG = showLabels ? labels.map((l,i)=>{
+    const lr = maxR + size*0.15;
+    const x = (cx+lr*Math.cos(ANGLES[i])).toFixed(1);
+    const y = (cy+lr*Math.sin(ANGLES[i])).toFixed(1);
+    const anchor = Math.cos(ANGLES[i])>0.15?'start':Math.cos(ANGLES[i])<-0.15?'end':'middle';
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="11" fill="var(--muted)">${l}</text>`;
+  }).join('') : '';
+  return `
+  <svg class="vapor-fingerprint" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="风味指纹图">
+    <polygon points="${ring(maxR)}" fill="none" stroke="var(--line)" stroke-width="1"/>
+    <polygon points="${ring(maxR*0.55)}" fill="none" stroke="var(--line)" stroke-width="0.6"/>
+    <polygon points="${shapePts}" fill="var(--muted)" opacity="0.10" transform-origin="${cx}px ${cy}px" transform="scale(1.12)"/>
+    <polygon points="${shapePts}" fill="var(--muted)" opacity="0.14" transform-origin="${cx}px ${cy}px" transform="scale(1.06)"/>
+    <polygon points="${shapePts}" fill="var(--ink)" opacity="0.20" stroke="var(--muted)" stroke-width="${size>150?1.6:1.2}"/>
+    ${labelsSVG}
+  </svg>`;
+}
+
+/* ---------- rarity tier (score-based card border) ---------- */
+function rarityTier(score){
+  const s = Number(score)||0;
+  if(s>=10) return {name:'电子涅槃', color:null, rainbow:true};
+  if(s>=8.5) return {name:'灵魂共振', color:'#BA7517'};
+  if(s>=7) return {name:'小型觉醒', color:'#9333EA'};
+  if(s>=5) return {name:'凡夫俗子', color:'#378ADD'};
+  return {name:'戒断反射', color:'#639922'};
+}
+function rarityBorderStyle(score){
+  const tier = rarityTier(score);
+  if(tier.rainbow){
+    return `border:1.5px solid transparent;background-image:linear-gradient(var(--paper),var(--paper)),linear-gradient(90deg,#D4537E,#9333EA,#378ADD,#639922,#BA7517);background-origin:border-box;background-clip:padding-box,border-box;`;
+  }
+  return `border:1.5px solid ${tier.color};`;
+}
+
+/* ---------- purchase records (per-unit bought/finished tracking) ---------- */
+function getPurchases(e){
+  if(Array.isArray(e.purchases)) return e.purchases;
+  const count = e.purchaseCount || 1;
+  const purchases = [];
+  for(let i=0;i<count;i++){
+    purchases.push({ id: 'p'+i, boughtDate: e.dateTried || '', finishedDate: null });
+  }
+  return purchases;
+}
+
+async function savePurchases(e, purchases, toastMsg){
+  const entryData = { ...entryToData(e), purchases, purchaseCount: purchases.length };
+  try{
+    const updated = await updateEntryCloud(e.id, entryData);
+    entries = entries.map(x => String(x.id)===String(e.id) ? updated : x);
+    if(toastMsg) showToast(toastMsg);
+    openDetailPanel(e.id);
+    render();
+  }catch(err){
+    showToast('更新失败：' + (err.message || '网络问题'));
+  }
+}
+
+async function addNewPurchase(e){
+  const input = prompt('购入日期（YYYY-MM-DD），留空默认今天', new Date().toISOString().slice(0,10));
+  if(input === null) return;
+  const boughtDate = input.trim() || new Date().toISOString().slice(0,10);
+  const purchases = getPurchases(e).map(p=>({...p}));
+  purchases.push({ id: 'p'+Date.now(), boughtDate, finishedDate: null });
+  await savePurchases(e, purchases, '已记录新的一根');
+}
+
+async function markPurchaseFinished(id, pid){
+  const e = entries.find(x=>String(x.id)===String(id));
+  if(!e) return;
+  const input = prompt('抽完日期（YYYY-MM-DD）', new Date().toISOString().slice(0,10));
+  if(input === null) return;
+  const finishedDate = input.trim() || new Date().toISOString().slice(0,10);
+  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, finishedDate} : {...p});
+  await savePurchases(e, purchases, '已标记抽完');
+}
+
+async function updatePurchaseDate(id, pid, field, value){
+  const e = entries.find(x=>String(x.id)===String(id));
+  if(!e) return;
+  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, [field]: value} : {...p});
+  await savePurchases(e, purchases);
+}
+
+/* ---------- graveyard (finished purchases, eulogy generated) ---------- */
+function getGraveyardEntries(entriesList){
+  const list = [];
+  entriesList.forEach(e=>{
+    getPurchases(e).forEach(p=>{
+      if(p.finishedDate){
+        list.push({
+          purchaseId: p.id, entryId: e.id, name: e.name||'未命名', brand: e.brand||'',
+          score: Number(e.score)||0, boughtDate: p.boughtDate||'', finishedDate: p.finishedDate
+        });
+      }
+    });
+  });
+  list.sort((a,b)=> new Date(b.finishedDate) - new Date(a.finishedDate));
+  return list;
+}
+
+function eulogyText(item){
+  const hasDays = item.boughtDate && item.finishedDate;
+  const days = hasDays ? Math.max(0, Math.round((new Date(item.finishedDate)-new Date(item.boughtDate))/86400000)) : null;
+  const templates = [];
+  if(item.score >= 8.5){
+    templates.push(`[灵魂共振] ${days!==null?`${days} 天里，`:''}它曾让某个深夜不那么难熬，直到最后一口散尽。`);
+  }else if(item.score < 5){
+    templates.push(`[古老的爬虫脑] 早该扔了对吧，可手指还是舍不得停下来。`);
+  }else{
+    templates.push(`[退役通知] 没成为传说，但成为了某几天的背景音。`);
+  }
+  templates.push(`[内陆帝国] 你知道自己迟早会再买同款的，这不是结束，是轮回。`);
+  if(days!==null){
+    templates.push(`[遗物档案] 从相遇到耗尽，一共 ${days} 天，喉咙记得每一天。`);
+  }
+  templates.push(`[戒断反射] 最后一口散尽的瞬间，手指还保持着按下的姿势。`);
+  let hash = 0;
+  for(const c of String(item.purchaseId)) hash = (hash*31 + c.charCodeAt(0)) | 0;
+  const idx = Math.abs(hash) % templates.length;
+  return templates[idx];
+}
 
 /* ---------- local config (device settings only: nickname + room codes) ---------- */
 function loadConfig(){
@@ -1109,7 +1272,7 @@ function cardHTML(e){
   const pct = Math.max(0, Math.min(100, (e.score/10)*100));
   const photo = e.photo ? `<img class="swatch" src="${e.photo}" style="object-fit:cover;">` : `<div class="swatch" style="background:${e.color||'#D9D9D9'}"></div>`;
   return `
-  <div class="card" data-id="${e.id}">
+  <div class="card" data-id="${e.id}" style="${rarityBorderStyle(e.score)}">
     ${wispSVG(1)}
     ${e.rebuy ? `<div class="rebuy-tag rebuy-${e.rebuy}">${e.rebuy==='会'?'会回购':e.rebuy==='还行'?'还行':'不回购'}</div>` : ''}
     <div class="swatch-row">
@@ -1120,6 +1283,7 @@ function cardHTML(e){
         ${activeRoom==='shared' ? `<div class="author-tag">@ ${escapeHtml(e.author||'匿名')}</div>` : ''}
         ${(e.purchaseCount||1) > 1 ? `<div class="purchase-tag">购入 ${e.purchaseCount} 次</div>` : ''}
       </div>
+      <div style="margin-left:auto;flex:none;">${fingerprintSVG(e, 44, false)}</div>
     </div>
     ${(e.tags&&e.tags.length) ? `<div class="chips">${e.tags.slice(0,4).map(t=>`<div class="chip">${escapeHtml(t)}</div>`).join('')}</div>` : ''}
     <div class="meta-row">
@@ -1171,6 +1335,7 @@ function openDetailPanel(id){
       </div>
     </div>
     <div class="detail-sub-scores">
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">${fingerprintSVG(e, 180, true)}</div>
       ${subRow('口味 FLAVOR', e.subSweet||0)}
       ${subRow('冰感 ICE', e.subIce||0)}
       ${subRow('烟雾量 VAPOR', e.subVapor||0)}
@@ -1184,13 +1349,26 @@ function openDetailPanel(id){
       <div><span>额定 Puffs</span>${e.puffs||'—'}</div>
       <div><span>入手日期</span>${e.dateTried||'—'}</div>
       <div><span>回购意愿</span>${e.rebuy||'—'}</div>
-      <div><span>购入次数</span>${e.purchaseCount||1} 次</div>
     </div>
     ${(e.tags&&e.tags.length) ? `<div class="chips" style="margin-bottom:16px;">${e.tags.map(t=>`<div class="chip">${escapeHtml(t)}</div>`).join('')}</div>` : ''}
     ${e.notes ? `<div class="detail-notes">${escapeHtml(e.notes)}</div>` : ''}
     ${!editable ? `<div class="readonly-banner">这条是 @${escapeHtml(e.author||'匿名')} 添加的，只有本人能编辑或删除</div>` : ''}
     ${(activeRoom==='personal' && config.groupCode) ? `<button type="button" class="photo-btn" id="shareToGroupBtn" style="width:100%;margin-bottom:14px;">分享到朋友群组</button>` : ''}
-    ${editable ? `<button type="button" class="photo-btn" id="addPurchaseBtn" style="width:100%;margin-bottom:14px;">+ 再次购入（当前 ${e.purchaseCount||1} 次）</button>` : ''}
+    ${editable ? `
+    <div class="purchase-section">
+      <div class="purchase-section-head">
+        <span>购入记录</span>
+        <button type="button" class="mini-btn" id="addPurchaseBtn">+ 新的一根</button>
+      </div>
+      ${getPurchases(e).map(p => `
+        <div class="purchase-row" data-pid="${p.id}">
+          <input type="date" data-field="boughtDate" value="${p.boughtDate||''}">
+          <span class="purchase-arrow">→</span>
+          ${p.finishedDate
+            ? `<input type="date" data-field="finishedDate" value="${p.finishedDate}">`
+            : `<button type="button" class="mini-btn finish-btn" data-pid="${p.id}">标记抽完</button>`}
+        </div>`).join('')}
+    </div>` : ''}
     <div class="panel-actions">
       ${editable ? `<button class="btn-danger" id="deleteBtn">删除这条记录</button>` : `<div></div>`}
       ${editable ? `<button class="btn-save" id="editBtn">编辑</button>` : `<div></div>`}
@@ -1208,8 +1386,17 @@ function openDetailPanel(id){
   }
   const addPurchaseBtn = document.getElementById('addPurchaseBtn');
   if(addPurchaseBtn){
-    addPurchaseBtn.addEventListener('click', ()=> incrementPurchase(e));
+    addPurchaseBtn.addEventListener('click', ()=> addNewPurchase(e));
   }
+  panel.querySelectorAll('.finish-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> markPurchaseFinished(e.id, btn.dataset.pid));
+  });
+  panel.querySelectorAll('.purchase-row input[type="date"]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const pid = inp.closest('.purchase-row').dataset.pid;
+      updatePurchaseDate(e.id, pid, inp.dataset.field, inp.value);
+    });
+  });
 }
 
 /* strips internal fields (id/author/createdAt) so an entry object can be safely
@@ -1217,19 +1404,6 @@ function openDetailPanel(id){
 function entryToData(e){
   const { id, author, createdAt, ...rest } = e;
   return rest;
-}
-
-async function incrementPurchase(e){
-  const newCount = (e.purchaseCount||1) + 1;
-  const entryData = { ...entryToData(e), purchaseCount: newCount };
-  try{
-    const updated = await updateEntryCloud(e.id, entryData);
-    entries = entries.map(x => String(x.id)===String(e.id) ? updated : x);
-    showToast('已记录第 ' + newCount + ' 次购入');
-    openDetailPanel(e.id);
-  }catch(err){
-    showToast('更新失败：' + (err.message || '网络问题'));
-  }
 }
 
 function spawnSmoke(btn){
@@ -1647,6 +1821,33 @@ function renderRecapPanel(personalEntries, range){
     btn.addEventListener('click', ()=> renderRecapPanel(personalEntries, btn.dataset.range));
   });
 }
+
+async function openGraveyardPanel(){
+  const personalEntries = await getPersonalEntriesForAchievements();
+  const grave = getGraveyardEntries(personalEntries);
+  panel.innerHTML = `
+    <div class="panel-head">
+      <h2>纪念馆</h2>
+      <div class="close-btn" id="closePanel">✕</div>
+    </div>
+    ${grave.length ? `
+    <div class="grave-list">
+      ${grave.map(item => `
+        <div class="grave-card">
+          <div class="grave-name">${escapeHtml(item.name)}${item.brand?' · '+escapeHtml(item.brand):''}</div>
+          <div class="grave-meta">${item.boughtDate||'日期不明'} → ${item.finishedDate} · 综合 ${item.score.toFixed(1)}</div>
+          <div class="grave-eulogy">${eulogyText(item)}</div>
+        </div>`).join('')}
+    </div>` : `
+    <div class="empty">
+      ${emptyCloudSVG}
+      <h3>还没有退役的烟弹</h3>
+      <p>在详情页把某一根标记为"抽完"，它就会被记在这里</p>
+    </div>`}
+  `;
+  overlay.classList.add('open');
+  document.getElementById('closePanel').addEventListener('click', closePanel);
+}
 const ACHIEVEMENTS = [
   { id:'starter', title:'[博学多闻] 你的舌头开始记笔记了', icon:'📔', desc:'测评满 10 款',
     flavor:'味觉系统已正式建档。从今往后，你的每一口都会被记下，无法假装没发生过。',
@@ -1796,6 +1997,7 @@ document.getElementById('sortSelect').addEventListener('change', render);
 document.getElementById('settingsBtn').addEventListener('click', openSettingsPanel);
 document.getElementById('achievementsBtn').addEventListener('click', openAchievementsPanel);
 document.getElementById('recapBtn').addEventListener('click', ()=> openRecapPanel('quarter'));
+document.getElementById('graveyardBtn').addEventListener('click', openGraveyardPanel);
 overlay.addEventListener('click', (e)=>{
   if(e.target===overlay){
     const hasClose = panel.querySelector('.close-btn');
