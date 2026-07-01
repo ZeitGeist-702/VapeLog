@@ -2014,7 +2014,8 @@ function checkAndShowNewAchievements(personalEntries){
   console.log('[成就调试] newIds:', newIds);
   console.log('[成就调试] achvShowing:', achvShowing, 'achvQueue.length:', achvQueue.length);
   if(newIds.length){
-    saveUnlockedAchvIds(currentIds);
+    const merged = Array.from(new Set([...stored, ...currentIds]));
+    saveUnlockedAchvIds(merged);
     newIds.forEach(id => achvQueue.push(ALL_ACHIEVEMENTS.find(a=>a.id===id)));
     showNextAchvModal();
   }
