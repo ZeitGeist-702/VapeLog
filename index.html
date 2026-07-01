@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -698,7 +698,7 @@ select.sort-select{
 .photo-btn{
   font-family:'Inter',sans-serif;
   font-size:13px;font-weight:600;
-  background:#fff;
+  background:var(--paper);
   border:1px solid var(--line);
   border-radius:10px;
   padding:9px 14px;
@@ -811,7 +811,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -1929,7 +1929,7 @@ async function openGraveyardPanel(){
     </div>` : `
     <div class="empty">
       ${emptyCloudSVG}
-      <h3>还没有退役的电子烟</h3>
+      <h3>还没有退役的烟弹</h3>
       <p>在详情页把某一根标记为"抽完"，它就会被记在这里</p>
     </div>`}
   `;
@@ -2002,12 +2002,17 @@ function saveUnlockedAchvIds(ids){
 function checkAndShowNewAchievements(personalEntries){
   const currentIds = ALL_ACHIEVEMENTS.filter(a=>a.check(personalEntries)).map(a=>a.id);
   const stored = getUnlockedAchvIds();
+  console.log('[成就调试] currentIds:', currentIds);
+  console.log('[成就调试] stored:', stored);
   if(stored === null){
     // first time using this feature: take current state as baseline, no popups
+    console.log('[成就调试] stored 是 null，只建立基线，不弹窗');
     saveUnlockedAchvIds(currentIds);
     return;
   }
   const newIds = currentIds.filter(id => !stored.includes(id));
+  console.log('[成就调试] newIds:', newIds);
+  console.log('[成就调试] achvShowing:', achvShowing, 'achvQueue.length:', achvQueue.length);
   if(newIds.length){
     saveUnlockedAchvIds(currentIds);
     newIds.forEach(id => achvQueue.push(ALL_ACHIEVEMENTS.find(a=>a.id===id)));
@@ -2022,6 +2027,7 @@ function formatAchvTitle(title){
 }
 
 function showNextAchvModal(){
+  if(achvShowing && !document.querySelector('.achv-modal-overlay')) achvShowing = false;
   if(achvShowing || !achvQueue.length) return;
   const a = achvQueue.shift();
   achvShowing = true;
