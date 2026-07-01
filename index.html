@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -260,7 +260,7 @@ select.sort-select{
 .like-btn svg{ width:17px; height:46px; flex:none; overflow:visible; }
 .pod-cartridge{ opacity:0; transform:translateY(-4px); transition:opacity .15s ease, transform .25s cubic-bezier(.2,.8,.3,1.3); }
 .like-btn.liked .pod-cartridge{ opacity:1; transform:translateY(0); }
-[data-theme="dark"] .pod-cartridge{ fill:rgba(220,225,228,0.16) !important; stroke:rgba(220,225,228,0.45) !important; }
+[data-theme="dark"] .like-btn .pod-cartridge{ fill:rgba(220,225,228,0.16) !important; stroke:rgba(220,225,228,0.45) !important; }
 .indicator{ fill:#C9D1CD; transition:fill .2s ease, filter .2s ease; }
 .like-btn.liked .indicator{ fill:#EAF6FF; filter:drop-shadow(0 0 1.5px #BFE3FF) drop-shadow(0 0 3px #8FC7F0); }
 .vapor-wisp{
@@ -305,16 +305,17 @@ select.sort-select{
   padding:28px 32px;text-align:center;
   box-shadow:0 20px 50px rgba(0,0,0,0.25);
 }
-.unbox-card svg{width:34px;height:92px;overflow:visible;}
+.unbox-card svg{width:56px;height:152px;overflow:visible;}
+.unbox-glow{display:inline-block;filter:drop-shadow(0 0 7px var(--glow-color,transparent)) drop-shadow(0 0 14px var(--glow-color,transparent));}
 .unbox-card .pod-cartridge{opacity:0;transform:translateY(-6px);transition:opacity .2s ease,transform .35s cubic-bezier(.2,.8,.3,1.3);}
 .unbox-card.show .pod-cartridge{opacity:1;transform:translateY(0);}
 .unbox-card .indicator{fill:#C9D1CD;transition:fill .25s ease,filter .25s ease;}
-.unbox-card.show .indicator{fill:#EAF6FF;filter:drop-shadow(0 0 2px #BFE3FF) drop-shadow(0 0 4px #8FC7F0);}
+.unbox-card.show .indicator{fill:var(--glow-color,#EAF6FF);filter:drop-shadow(0 0 2px var(--glow-color,#BFE3FF)) drop-shadow(0 0 4px var(--glow-color,#8FC7F0));}
 .unbox-card .vapor-wisp{fill:none;stroke:rgba(170,180,178,0.85);stroke-width:0.55;stroke-linecap:round;opacity:0;transform-box:fill-box;transform-origin:0 0;}
 .unbox-card.smoking .vapor-wisp.w1{animation:wisp-drift-a 1.6s ease-out;}
 .unbox-card.smoking .vapor-wisp.w2{animation:wisp-drift-b 1.7s ease-out;animation-delay:.18s;}
 .unbox-card.smoking .vapor-wisp.w3{animation:wisp-drift-c 1.8s ease-out;animation-delay:.38s;}
-.unbox-text{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:14px;letter-spacing:0.03em;}
+.unbox-text{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;margin-top:16px;letter-spacing:0.03em;}
 
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
 .chip{
@@ -810,7 +811,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -972,7 +973,7 @@ function unboxPipeSVG(tier){
     ${defsExtra}
   </defs>
   <rect x="3.5" y="9.3" width="7" height="28.7" rx="2" fill="url(#unboxMetalGrad)" stroke="#A8AFAD" stroke-width="0.4"/>
-  <path class="pod-cartridge" d="M3.5,9.3 L3.5,5.7 Q3.5,2 7,2 Q10.5,2 10.5,5.7 L10.5,9.3 Z" fill="${cartFill}" stroke="#1C1A18" stroke-width="0.4"/>
+  <path class="pod-cartridge" d="M3.5,9.3 L3.5,5.7 Q3.5,2 7,2 Q10.5,2 10.5,5.7 L10.5,9.3 Z" fill="${cartFill}" stroke="rgba(255,255,255,0.55)" stroke-width="0.4"/>
   <path class="indicator" d="M7 26.6 C4.8 24.6 4.3 22.5 5.5 21.4 C6.4 20.6 7 21.2 7 21.8 C7 21.2 7.6 20.6 8.5 21.4 C9.7 22.5 9.2 24.6 7 26.6 Z"/>
   <g class="smoke-group" transform="translate(7,2)">
     <path class="vapor-wisp w1" d="M0,0 Q1.5,-3 0,-6 Q-1.5,-9 0.5,-12 Q1.5,-14 0,-16"/>
@@ -984,9 +985,16 @@ function unboxPipeSVG(tier){
 
 function showUnboxAnimation(e){
   const tier = rarityTier(e.score);
+  const glowColor = tier.rainbow ? '#D4537E' : tier.color;
+  const textColor = tier.rainbow
+    ? 'background-image:linear-gradient(90deg,#D4537E,#9333EA,#378ADD,#639922,#BA7517);-webkit-background-clip:text;background-clip:text;color:transparent;'
+    : `color:${tier.color};`;
   const overlay = document.createElement('div');
   overlay.className = 'unbox-overlay';
-  overlay.innerHTML = `<div class="unbox-card">${unboxPipeSVG(tier)}<div class="unbox-text">${escapeHtml(tier.name)}</div></div>`;
+  overlay.innerHTML = `<div class="unbox-card">
+    <div class="unbox-glow" style="--glow-color:${glowColor};">${unboxPipeSVG(tier)}</div>
+    <div class="unbox-text" style="${textColor}">${escapeHtml(tier.name)}</div>
+  </div>`;
   document.body.appendChild(overlay);
   const card = overlay.querySelector('.unbox-card');
   requestAnimationFrame(()=>{
@@ -1745,6 +1753,7 @@ function renderForm(data, title){
     saveBtn.disabled = true;
     saveBtn.textContent = '保存中…';
     try{
+      let isNewEntry = false;
       if(editingId){
         const updated = await updateEntryCloud(editingId, entryData);
         entries = entries.map(e => String(e.id)===String(editingId) ? updated : e);
@@ -1752,11 +1761,16 @@ function renderForm(data, title){
         const created = await insertEntry(entryData);
         entries.unshift(created);
         showUnboxAnimation(created);
+        isNewEntry = true;
       }
       closePanel();
       render();
       if(activeRoom === 'personal'){
-        checkAndShowNewAchievements(entries);
+        if(isNewEntry){
+          setTimeout(()=> checkAndShowNewAchievements(entries), 2500);
+        }else{
+          checkAndShowNewAchievements(entries);
+        }
       }
       showToast(editingId ? '已保存修改' : '已添加新记录');
     }catch(err){
