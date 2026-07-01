@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -294,6 +294,28 @@ select.sort-select{
   100%{ opacity:0; transform:translate(0.4px,-13px) scale(1.8) rotate(3deg); }
 }
 
+.unbox-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  display:flex;align-items:center;justify-content:center;z-index:200;
+  opacity:0;transition:opacity .2s ease;
+}
+.unbox-overlay.show{opacity:1;}
+.unbox-card{
+  background:var(--paper);border-radius:16px;
+  padding:28px 32px;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,0.25);
+}
+.unbox-card svg{width:34px;height:92px;overflow:visible;}
+.unbox-card .pod-cartridge{opacity:0;transform:translateY(-6px);transition:opacity .2s ease,transform .35s cubic-bezier(.2,.8,.3,1.3);}
+.unbox-card.show .pod-cartridge{opacity:1;transform:translateY(0);}
+.unbox-card .indicator{fill:#C9D1CD;transition:fill .25s ease,filter .25s ease;}
+.unbox-card.show .indicator{fill:#EAF6FF;filter:drop-shadow(0 0 2px #BFE3FF) drop-shadow(0 0 4px #8FC7F0);}
+.unbox-card .vapor-wisp{fill:none;stroke:rgba(170,180,178,0.85);stroke-width:0.55;stroke-linecap:round;opacity:0;transform-box:fill-box;transform-origin:0 0;}
+.unbox-card.smoking .vapor-wisp.w1{animation:wisp-drift-a 1.6s ease-out;}
+.unbox-card.smoking .vapor-wisp.w2{animation:wisp-drift-b 1.7s ease-out;animation-delay:.18s;}
+.unbox-card.smoking .vapor-wisp.w3{animation:wisp-drift-c 1.8s ease-out;animation-delay:.38s;}
+.unbox-text{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:14px;letter-spacing:0.03em;}
+
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
 .chip{
   font-size:11px;
@@ -400,6 +422,7 @@ select.sort-select{
   margin-bottom:32px;
 }
 .panel-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:12px;}
+.ident-code{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.04em;margin-top:2px;}
 .panel-head h2{font-family:'Space Grotesk',sans-serif;font-size:21px;margin:0;}
 .close-btn{
   background:var(--paper-soft);
@@ -787,7 +810,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -919,6 +942,65 @@ const pipeSVG = `<svg class="device" viewBox="0 0 14 38" xmlns="http://www.w3.or
   </g>
 </svg>`;
 const emptyCloudSVG = `<svg viewBox="0 0 100 60" fill="none"><path d="M20 45 Q15 28 35 30 Q42 14 60 22 Q80 18 78 35 Q92 38 85 50 Q75 58 55 53 Q35 60 22 52 Q10 50 20 45Z" stroke="#6E8C82" stroke-width="2.5"/></svg>`;
+
+function entryIdentCode(e){
+  const sorted = [...entries].sort((a,b)=> (a.createdAt||0)-(b.createdAt||0));
+  const idx = sorted.findIndex(x=>String(x.id)===String(e.id));
+  const num = idx>=0 ? idx+1 : sorted.length+1;
+  return '识别码 · ' + String(num).padStart(4,'0');
+}
+
+function unboxPipeSVG(tier){
+  const fillId = 'unboxCartFill_' + Math.random().toString(36).slice(2,8);
+  const defsExtra = tier.rainbow
+    ? `<linearGradient id="${fillId}" x1="0%" y1="0%" x2="100%" y2="100%">
+         <stop offset="0%" stop-color="#D4537E"/>
+         <stop offset="25%" stop-color="#9333EA"/>
+         <stop offset="50%" stop-color="#378ADD"/>
+         <stop offset="75%" stop-color="#639922"/>
+         <stop offset="100%" stop-color="#BA7517"/>
+       </linearGradient>`
+    : '';
+  const cartFill = tier.rainbow ? `url(#${fillId})` : tier.color;
+  return `<svg class="device" viewBox="0 0 14 38" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+  <defs>
+    <linearGradient id="unboxMetalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C7CCCB"/>
+      <stop offset="40%" stop-color="#E4E8E7"/>
+      <stop offset="100%" stop-color="#B8BDBC"/>
+    </linearGradient>
+    ${defsExtra}
+  </defs>
+  <rect x="3.5" y="9.3" width="7" height="28.7" rx="2" fill="url(#unboxMetalGrad)" stroke="#A8AFAD" stroke-width="0.4"/>
+  <path class="pod-cartridge" d="M3.5,9.3 L3.5,5.7 Q3.5,2 7,2 Q10.5,2 10.5,5.7 L10.5,9.3 Z" fill="${cartFill}" stroke="#1C1A18" stroke-width="0.4"/>
+  <path class="indicator" d="M7 26.6 C4.8 24.6 4.3 22.5 5.5 21.4 C6.4 20.6 7 21.2 7 21.8 C7 21.2 7.6 20.6 8.5 21.4 C9.7 22.5 9.2 24.6 7 26.6 Z"/>
+  <g class="smoke-group" transform="translate(7,2)">
+    <path class="vapor-wisp w1" d="M0,0 Q1.5,-3 0,-6 Q-1.5,-9 0.5,-12 Q1.5,-14 0,-16"/>
+    <path class="vapor-wisp w2" d="M0,0 Q-1.2,-3 0.8,-5.5 Q2,-8 -0.5,-11 Q-1.5,-13 0.5,-15"/>
+    <path class="vapor-wisp w3" d="M0,0 Q1,-2.5 -0.8,-5 Q-2,-7.5 0.3,-10 Q1.5,-12.5 -0.3,-15.5"/>
+  </g>
+</svg>`;
+}
+
+function showUnboxAnimation(e){
+  const tier = rarityTier(e.score);
+  const overlay = document.createElement('div');
+  overlay.className = 'unbox-overlay';
+  overlay.innerHTML = `<div class="unbox-card">${unboxPipeSVG(tier)}<div class="unbox-text">${escapeHtml(tier.name)}</div></div>`;
+  document.body.appendChild(overlay);
+  const card = overlay.querySelector('.unbox-card');
+  requestAnimationFrame(()=>{
+    overlay.classList.add('show');
+    card.classList.add('show');
+    setTimeout(()=> card.classList.add('smoking'), 200);
+  });
+  const close = ()=>{
+    overlay.classList.remove('show');
+    setTimeout(()=> overlay.remove(), 220);
+  };
+  overlay.addEventListener('click', close);
+  setTimeout(close, 2400);
+}
 
 /* ---------- vapor fingerprint (5-axis mist radar) ---------- */
 function fingerprintSVG(e, size, showLabels){
@@ -1322,7 +1404,10 @@ function openDetailPanel(id){
     </div>`;
   panel.innerHTML = `
     <div class="panel-head">
-      <h2>${escapeHtml(e.name||'未命名')}</h2>
+      <div>
+        <h2>${escapeHtml(e.name||'未命名')}</h2>
+        <div class="ident-code">${entryIdentCode(e)}</div>
+      </div>
       <div class="close-btn" id="closePanel">✕</div>
     </div>
     ${activeRoom==='shared' ? `<div class="author-tag" style="margin-bottom:14px;">@ ${escapeHtml(e.author||'匿名')} 添加</div>` : ''}
@@ -1666,6 +1751,7 @@ function renderForm(data, title){
       }else{
         const created = await insertEntry(entryData);
         entries.unshift(created);
+        showUnboxAnimation(created);
       }
       closePanel();
       render();
@@ -1883,6 +1969,20 @@ function brandMax(es){
   return vals.length ? Math.max(...vals) : 0;
 }
 
+const RARITY_TIER_NAMES = ['戒断反射','凡夫俗子','小型觉醒','灵魂共振','电子涅槃'];
+function rarityTiersOwned(es){
+  const owned = new Set(es.map(e=>rarityTier(e.score).name));
+  return RARITY_TIER_NAMES.filter(t=>owned.has(t));
+}
+
+const HIDDEN_ACHIEVEMENTS = [
+  { id:'spectrum_full', title:'[光谱全览] 五种颜色都尝过了', icon:'🌈', desc:'集齐五档稀有度各一款',
+    flavor:'从灰扑扑的戒断反射到彩光流转的电子涅槃，你的舌头没有偏见，只有好奇心压过了理智。',
+    check:(es)=> rarityTiersOwned(es).length>=5,
+    progress:(es)=> rarityTiersOwned(es).length+' / 5' }
+];
+const ALL_ACHIEVEMENTS = [...ACHIEVEMENTS, ...HIDDEN_ACHIEVEMENTS];
+
 /* ---------- achievement unlock detection & celebration modal ---------- */
 let achvQueue = [];
 let achvShowing = false;
@@ -1898,7 +1998,7 @@ function saveUnlockedAchvIds(ids){
 }
 
 function checkAndShowNewAchievements(personalEntries){
-  const currentIds = ACHIEVEMENTS.filter(a=>a.check(personalEntries)).map(a=>a.id);
+  const currentIds = ALL_ACHIEVEMENTS.filter(a=>a.check(personalEntries)).map(a=>a.id);
   const stored = getUnlockedAchvIds();
   if(stored === null){
     // first time using this feature: take current state as baseline, no popups
@@ -1908,7 +2008,7 @@ function checkAndShowNewAchievements(personalEntries){
   const newIds = currentIds.filter(id => !stored.includes(id));
   if(newIds.length){
     saveUnlockedAchvIds(currentIds);
-    newIds.forEach(id => achvQueue.push(ACHIEVEMENTS.find(a=>a.id===id)));
+    newIds.forEach(id => achvQueue.push(ALL_ACHIEVEMENTS.find(a=>a.id===id)));
     showNextAchvModal();
   }
 }
@@ -1967,6 +2067,7 @@ async function getPersonalEntriesForAchievements(){
 async function openAchievementsPanel(){
   const personalEntries = await getPersonalEntriesForAchievements();
   const unlockedCount = ACHIEVEMENTS.filter(a=>a.check(personalEntries)).length;
+  const hiddenUnlocked = HIDDEN_ACHIEVEMENTS.filter(a=>a.check(personalEntries));
   panel.innerHTML = `
     <div class="panel-head">
       <h2>成就墙</h2>
@@ -1981,6 +2082,18 @@ async function openAchievementsPanel(){
           ${unlocked ? `<div class="badge-title">${a.title}</div>` : `<div class="badge-redacted"></div>`}
           <div class="badge-desc">${a.desc}</div>
           <div class="badge-progress">${unlocked ? '已解锁' : a.progress(personalEntries)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="hint-text" style="margin:20px 0 10px;">隐藏成就 · ${hiddenUnlocked.length} / ${HIDDEN_ACHIEVEMENTS.length}</div>
+    <div class="badge-list">
+      ${HIDDEN_ACHIEVEMENTS.map(a=>{
+        const unlocked = a.check(personalEntries);
+        return `
+        <div class="badge-card ${unlocked?'unlocked':'locked'}">
+          ${unlocked ? `<div class="badge-title">${a.title}</div>` : `<div class="badge-redacted"></div>`}
+          <div class="badge-desc">${unlocked ? a.desc : '？？？'}</div>
+          <div class="badge-progress">${unlocked ? '已解锁' : '未知'}</div>
         </div>`;
       }).join('')}
     </div>
