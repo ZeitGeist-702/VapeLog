@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -201,6 +201,9 @@ select.sort-select{
   color:#fff;
   border-color:var(--sage);
 }
+
+.tag-picker{display:flex;flex-wrap:wrap;gap:6px;}
+.tag-picker .tag-chip{margin:0;}
 
 /* ---- grid ---- */
 .grid{
@@ -811,7 +814,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -1055,13 +1058,16 @@ function getPurchases(e){
 
 async function savePurchases(e, purchases, toastMsg){
   const entryData = { ...entryToData(e), purchases, purchaseCount: purchases.length };
+  console.log('[购入调试] 准备发送的 entryData.purchases:', JSON.parse(JSON.stringify(purchases)));
   try{
     const updated = await updateEntryCloud(e.id, entryData);
+    console.log('[购入调试] 云端返回的 updated.purchases:', JSON.parse(JSON.stringify(updated.purchases||null)));
     entries = entries.map(x => String(x.id)===String(e.id) ? updated : x);
     if(toastMsg) showToast(toastMsg);
     openDetailPanel(e.id);
     render();
   }catch(err){
+    console.log('[购入调试] 保存出错:', err);
     showToast('更新失败：' + (err.message || '网络问题'));
   }
 }
@@ -1162,6 +1168,7 @@ async function loadEntries(){
       author: row.author,
       createdAt: new Date(row.created_at).getTime()
     }));
+    console.log('[购入调试] 重新加载后，各条记录的 purchases:', entries.map(x=>({name:x.name, purchases:x.purchases||null, purchaseCount:x.purchaseCount})));
     if(activeRoom === 'personal'){
       checkAndShowNewAchievements(entries);
     }
@@ -1265,6 +1272,13 @@ function allTags(){
   entries.forEach(e => (e.tags||[]).forEach(t => set.add(t)));
   return Array.from(set);
 }
+
+const PRESET_TAGS = [
+  '水果','薄荷','烟草','甜品','饮料','花香','混合口味',
+  '冰感','顺滑','呛喉','回甘','后劲强',
+  '办公室','深夜','追剧','户外','通勤',
+  '一次性','换弹','限量款','断货难买','高性价比'
+];
 
 function renderTagRow(){
   const tags = allTags();
@@ -1601,7 +1615,13 @@ function renderForm(data, title){
       <div class="field"><label>品牌</label><input type="text" id="f_brand" value="${escapeHtml(data.brand)}" placeholder="品牌名"></div>
     </div>
     <div class="field"><label>口味描述</label><input type="text" id="f_flavor" value="${escapeHtml(data.flavor)}" placeholder="例如：冰感强烈，西瓜味偏甜"></div>
-    <div class="field"><label>标签（逗号分隔）</label><input type="text" id="f_tags" value="${escapeHtml(data.tagsStr)}" placeholder="水果, 冰感, 一次性"></div>
+    <div class="field">
+      <label>标签</label>
+      <div class="tag-picker" id="tagPicker">
+        ${PRESET_TAGS.map(t=>`<div class="tag-chip picker-chip ${(data.tags||[]).includes(t)?'active':''}" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</div>`).join('')}
+      </div>
+      <input type="text" id="f_tags_custom" placeholder="其他标签，逗号分隔（可选）" style="margin-top:8px;" value="${escapeHtml((data.tags||[]).filter(t=>!PRESET_TAGS.includes(t)).join(', '))}">
+    </div>
     <div class="field-row">
       <div class="field"><label>价格（¥）</label><input type="number" id="f_price" value="${data.price||''}" placeholder="0"></div>
       <div class="field"><label>额定 Puffs</label><input type="number" id="f_puffs" value="${data.puffs||''}" placeholder="例如：600"></div>
@@ -1713,10 +1733,16 @@ function renderForm(data, title){
     });
   });
 
+  document.querySelectorAll('#tagPicker .picker-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=> chip.classList.toggle('active'));
+  });
+
   document.getElementById('saveBtn').addEventListener('click', async ()=>{
     const name = document.getElementById('f_name').value.trim();
     if(!name){ showToast('请填写名称'); return; }
-    const tags = document.getElementById('f_tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+    const presetTags = Array.from(document.querySelectorAll('#tagPicker .picker-chip.active')).map(c=>c.dataset.tag);
+    const customTags = document.getElementById('f_tags_custom').value.split(',').map(t=>t.trim()).filter(Boolean);
+    const tags = Array.from(new Set([...presetTags, ...customTags]));
     const entryData = {
       name,
       brand: document.getElementById('f_brand').value.trim(),
@@ -1929,7 +1955,7 @@ async function openGraveyardPanel(){
     </div>` : `
     <div class="empty">
       ${emptyCloudSVG}
-      <h3>还没有退役的电子烟</h3>
+      <h3>还没有退役的烟弹</h3>
       <p>在详情页把某一根标记为"抽完"，它就会被记在这里</p>
     </div>`}
   `;
