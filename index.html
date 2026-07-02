@@ -766,16 +766,18 @@ select.sort-select{
 }
 .mini-btn:hover{border-color:var(--sage);}
 .purchase-row{
-  display:flex;align-items:center;gap:8px;
   background:var(--paper-soft);border-radius:10px;
   padding:8px 10px;margin-bottom:6px;font-size:12.5px;
 }
+.purchase-row-dates{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.purchase-row-actions{display:flex;justify-content:flex-end;gap:6px;}
 .purchase-row input[type="date"]{
   font-family:'IBM Plex Mono',monospace;font-size:12px;
   border:1px solid var(--line);border-radius:6px;
   background:var(--paper);color:var(--ink);
   padding:4px 6px;flex:1;min-width:0;
 }
+.purchase-row input[type="date"]:disabled{opacity:0.4;background:var(--line);}
 .purchase-arrow{color:var(--muted);flex:none;}
 
 .grave-list{display:flex;flex-direction:column;gap:10px;}
@@ -1081,21 +1083,11 @@ async function addNewPurchase(e){
   await savePurchases(e, purchases, '已记录新的一根');
 }
 
-async function markPurchaseFinished(id, pid){
+async function saveRowPurchase(id, pid, boughtDate, finishedDate){
   const e = entries.find(x=>String(x.id)===String(id));
   if(!e) return;
-  const input = prompt('抽完日期（YYYY-MM-DD）', new Date().toISOString().slice(0,10));
-  if(input === null) return;
-  const finishedDate = input.trim() || new Date().toISOString().slice(0,10);
-  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, finishedDate} : {...p});
-  await savePurchases(e, purchases, '已标记抽完');
-}
-
-async function updatePurchaseDate(id, pid, field, value){
-  const e = entries.find(x=>String(x.id)===String(id));
-  if(!e) return;
-  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, [field]: value} : {...p});
-  await savePurchases(e, purchases);
+  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, boughtDate, finishedDate} : {...p});
+  await savePurchases(e, purchases, '已保存');
 }
 
 /* ---------- graveyard (finished purchases, eulogy generated) ---------- */
@@ -1457,11 +1449,15 @@ function openDetailPanel(id){
       </div>
       ${getPurchases(e).map(p => `
         <div class="purchase-row" data-pid="${p.id}">
-          <input type="date" data-field="boughtDate" value="${p.boughtDate||''}">
-          <span class="purchase-arrow">→</span>
-          ${p.finishedDate
-            ? `<input type="date" data-field="finishedDate" value="${p.finishedDate}">`
-            : `<button type="button" class="mini-btn finish-btn" data-pid="${p.id}">标记抽完</button>`}
+          <div class="purchase-row-dates">
+            <input type="date" data-field="boughtDate" value="${p.boughtDate||''}">
+            <span class="purchase-arrow">→</span>
+            <input type="date" data-field="finishedDate" value="${p.finishedDate||''}" ${p.finishedDate?'':'disabled'}>
+          </div>
+          <div class="purchase-row-actions">
+            <button type="button" class="mini-btn toggle-finish-btn" data-pid="${p.id}">${p.finishedDate?'撤销标记':'标记抽完'}</button>
+            <button type="button" class="mini-btn save-row-btn" data-pid="${p.id}">保存</button>
+          </div>
         </div>`).join('')}
     </div>` : ''}
     <div class="panel-actions">
@@ -1483,13 +1479,29 @@ function openDetailPanel(id){
   if(addPurchaseBtn){
     addPurchaseBtn.addEventListener('click', ()=> addNewPurchase(e));
   }
-  panel.querySelectorAll('.finish-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=> markPurchaseFinished(e.id, btn.dataset.pid));
+  panel.querySelectorAll('.toggle-finish-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const row = btn.closest('.purchase-row');
+      const finishedInput = row.querySelector('input[data-field="finishedDate"]');
+      if(finishedInput.disabled){
+        finishedInput.disabled = false;
+        finishedInput.value = new Date().toISOString().slice(0,10);
+        btn.textContent = '撤销标记';
+      }else{
+        finishedInput.disabled = true;
+        finishedInput.value = '';
+        btn.textContent = '标记抽完';
+      }
+    });
   });
-  panel.querySelectorAll('.purchase-row input[type="date"]').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
-      const pid = inp.closest('.purchase-row').dataset.pid;
-      updatePurchaseDate(e.id, pid, inp.dataset.field, inp.value);
+  panel.querySelectorAll('.save-row-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const row = btn.closest('.purchase-row');
+      const pid = row.dataset.pid;
+      const boughtDate = row.querySelector('input[data-field="boughtDate"]').value;
+      const finishedInput = row.querySelector('input[data-field="finishedDate"]');
+      const finishedDate = finishedInput.disabled ? null : (finishedInput.value || null);
+      saveRowPurchase(e.id, pid, boughtDate, finishedDate);
     });
   });
 }
