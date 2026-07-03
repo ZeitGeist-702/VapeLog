@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -448,7 +448,7 @@ select.sort-select{
   text-transform:uppercase;
   letter-spacing:0.03em;
 }
-.field input[type=text], .field input[type=number], .field input[type=date], .field textarea{
+.field input[type=text], .field input[type=number], .field input[type=date], .field textarea, .field select{
   width:100%;
   padding:10px 12px;
   border-radius:10px;
@@ -778,6 +778,13 @@ select.sort-select{
   padding:4px 6px;flex:1;min-width:0;
 }
 .purchase-row input[type="date"]:disabled{opacity:0.4;background:var(--line);}
+.purchase-row .epitaph-input{
+  width:100%;font-family:'Inter',sans-serif;font-size:12px;
+  border:1px solid var(--line);border-radius:6px;
+  background:var(--paper);color:var(--ink);
+  padding:5px 8px;
+}
+.purchase-row .epitaph-input:disabled{opacity:0.4;background:var(--line);}
 .purchase-arrow{color:var(--muted);flex:none;}
 
 .grave-list{display:flex;flex-direction:column;gap:10px;}
@@ -816,7 +823,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -1083,10 +1090,10 @@ async function addNewPurchase(e){
   await savePurchases(e, purchases, '已记录新的一根');
 }
 
-async function saveRowPurchase(id, pid, boughtDate, finishedDate){
+async function saveRowPurchase(id, pid, boughtDate, finishedDate, epitaph){
   const e = entries.find(x=>String(x.id)===String(id));
   if(!e) return;
-  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, boughtDate, finishedDate} : {...p});
+  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, boughtDate, finishedDate, epitaph: epitaph||''} : {...p});
   await savePurchases(e, purchases, '已保存');
 }
 
@@ -1098,7 +1105,8 @@ function getGraveyardEntries(entriesList){
       if(p.finishedDate){
         list.push({
           purchaseId: p.id, entryId: e.id, name: e.name||'未命名', brand: e.brand||'',
-          score: Number(e.score)||0, boughtDate: p.boughtDate||'', finishedDate: p.finishedDate
+          score: Number(e.score)||0, boughtDate: p.boughtDate||'', finishedDate: p.finishedDate,
+          epitaph: p.epitaph||''
         });
       }
     });
@@ -1133,9 +1141,9 @@ function eulogyText(item){
 function loadConfig(){
   try{
     const raw = localStorage.getItem('vape-config');
-    config = raw ? JSON.parse(raw) : { nickname:'', personalCode:'', groupCode:'' };
+    config = raw ? JSON.parse(raw) : { nickname:'', personalCode:'', groupCode:'', equippedTitle:'' };
   }catch(e){
-    config = { nickname:'', personalCode:'', groupCode:'' };
+    config = { nickname:'', personalCode:'', groupCode:'', equippedTitle:'' };
   }
 }
 function saveConfig(){
@@ -1364,7 +1372,7 @@ function cardHTML(e){
       <div>
         <div class="card-name">${escapeHtml(e.name||'未命名')}</div>
         <div class="card-brand">${escapeHtml(e.brand||'')}</div>
-        ${activeRoom==='shared' ? `<div class="author-tag">@ ${escapeHtml(e.author||'匿名')}</div>` : ''}
+        ${activeRoom==='shared' ? `<div class="author-tag">@ ${escapeHtml(e.author||'匿名')}${e.authorTitle?` · ${escapeHtml(e.authorTitle)}`:''}</div>` : ''}
         ${(e.purchaseCount||1) > 1 ? `<div class="purchase-tag">购入 ${e.purchaseCount} 次</div>` : ''}
       </div>
       <div style="margin-left:auto;flex:none;">${fingerprintSVG(e, 44, false)}</div>
@@ -1412,7 +1420,7 @@ function openDetailPanel(id){
       </div>
       <div class="close-btn" id="closePanel">✕</div>
     </div>
-    ${activeRoom==='shared' ? `<div class="author-tag" style="margin-bottom:14px;">@ ${escapeHtml(e.author||'匿名')} 添加</div>` : ''}
+    ${activeRoom==='shared' ? `<div class="author-tag" style="margin-bottom:14px;">@ ${escapeHtml(e.author||'匿名')}${e.authorTitle?` · ${escapeHtml(e.authorTitle)}`:''} 添加</div>` : ''}
     ${activeRoom==='shared' ? `<div style="margin-bottom:14px;">${likeButtonHTML(e)}</div>` : ''}
     ${e.photo ? `<img class="detail-photo" src="${e.photo}">` : ''}
     <div class="detail-score-block">
@@ -1454,6 +1462,7 @@ function openDetailPanel(id){
             <span class="purchase-arrow">→</span>
             <input type="date" data-field="finishedDate" value="${p.finishedDate||''}" ${p.finishedDate?'':'disabled'}>
           </div>
+          <input type="text" class="epitaph-input" data-field="epitaph" value="${escapeHtml(p.epitaph||'')}" placeholder="留一句遗言（选填）" style="margin-bottom:6px;" ${p.finishedDate?'':'disabled'}>
           <div class="purchase-row-actions">
             <button type="button" class="mini-btn toggle-finish-btn" data-pid="${p.id}">${p.finishedDate?'撤销标记':'标记抽完'}</button>
             <button type="button" class="mini-btn save-row-btn" data-pid="${p.id}">保存</button>
@@ -1483,13 +1492,17 @@ function openDetailPanel(id){
     btn.addEventListener('click', ()=>{
       const row = btn.closest('.purchase-row');
       const finishedInput = row.querySelector('input[data-field="finishedDate"]');
+      const epitaphInput = row.querySelector('.epitaph-input');
       if(finishedInput.disabled){
         finishedInput.disabled = false;
         finishedInput.value = new Date().toISOString().slice(0,10);
+        epitaphInput.disabled = false;
         btn.textContent = '撤销标记';
       }else{
         finishedInput.disabled = true;
         finishedInput.value = '';
+        epitaphInput.disabled = true;
+        epitaphInput.value = '';
         btn.textContent = '标记抽完';
       }
     });
@@ -1501,7 +1514,9 @@ function openDetailPanel(id){
       const boughtDate = row.querySelector('input[data-field="boughtDate"]').value;
       const finishedInput = row.querySelector('input[data-field="finishedDate"]');
       const finishedDate = finishedInput.disabled ? null : (finishedInput.value || null);
-      saveRowPurchase(e.id, pid, boughtDate, finishedDate);
+      const epitaphInput = row.querySelector('.epitaph-input');
+      const epitaph = finishedInput.disabled ? '' : epitaphInput.value.trim();
+      saveRowPurchase(e.id, pid, boughtDate, finishedDate, epitaph);
     });
   });
 }
@@ -1549,7 +1564,7 @@ async function toggleLike(id){
 
 async function shareToGroup(e){
   if(!config.groupCode){ showToast('请先在设置里加入一个群组码'); return; }
-  const entryData = entryToData(e);
+  const entryData = { ...entryToData(e), authorTitle: config.equippedTitle || null };
   try{
     const { error } = await sb.from('entries').insert({ room_code: config.groupCode, author: config.nickname, data: entryData });
     if(error) throw error;
@@ -1808,7 +1823,12 @@ function renderForm(data, title){
 }
 
 /* ---------- settings / first-run setup panel ---------- */
-function renderSettingsForm(isFirstRun){
+async function renderSettingsForm(isFirstRun){
+  let titleOptions = [];
+  if(!isFirstRun){
+    const personalEntries = await getPersonalEntriesForAchievements();
+    titleOptions = getTitles(personalEntries);
+  }
   panel.innerHTML = `
     <div class="panel-head">
       <h2>${isFirstRun ? '欢迎，先设置一下' : '设置'}</h2>
@@ -1818,6 +1838,15 @@ function renderSettingsForm(isFirstRun){
       <label>你的昵称</label>
       <input type="text" id="s_nickname" value="${escapeHtml(config.nickname)}" placeholder="给自己起个名字，朋友共享时会看到">
     </div>
+    ${!isFirstRun ? `
+    <div class="field">
+      <label>称号</label>
+      <select id="s_title">
+        <option value="">不显示称号</option>
+        ${titleOptions.map(t=>`<option value="${escapeHtml(t)}" ${config.equippedTitle===t?'selected':''}>${escapeHtml(t)}</option>`).join('')}
+      </select>
+      <div class="hint-text">${titleOptions.length ? '挑一个挂在共享区昵称旁边——下次分享测评时才会生效，不是实时同步。' : '目前还没解锁任何称号，多测评几款、测评回顾里能看到进度。'}</div>
+    </div>` : ''}
     <div class="field">
       <label>私人同步码</label>
       <div class="code-row">
@@ -1850,9 +1879,10 @@ function renderSettingsForm(isFirstRun){
     const nickname = document.getElementById('s_nickname').value.trim();
     const personal = document.getElementById('s_personal').value.trim();
     const group = document.getElementById('s_group').value.trim();
+    const equippedTitle = isFirstRun ? '' : document.getElementById('s_title').value;
     if(!nickname){ showToast('请填写昵称'); return; }
     if(!personal){ showToast('私人同步码不能为空'); return; }
-    config = { nickname, personalCode: personal, groupCode: group };
+    config = { nickname, personalCode: personal, groupCode: group, equippedTitle };
     saveConfig();
     closePanel();
     activeTag = null;
@@ -1912,6 +1942,11 @@ function renderRecapPanel(personalEntries, range){
   const filtered = filterByRange(personalEntries, range);
   const stats = computeRecapStats(filtered);
   const rangeLabel = range==='quarter' ? '本季度' : range==='year' ? '今年' : '全部时间';
+  const avgField = (field) => filtered.length ? filtered.reduce((s,e)=>s+(Number(e[field])||0),0)/filtered.length : 0;
+  const avgFingerprint = {
+    subSweet: avgField('subSweet'), subIce: avgField('subIce'), subVapor: avgField('subVapor'),
+    subSmooth: avgField('subSmooth'), subThroat: avgField('subThroat')
+  };
   panel.innerHTML = `
     <div class="panel-head">
       <h2>测评回顾</h2>
@@ -1940,6 +1975,19 @@ function renderRecapPanel(personalEntries, range){
       <div class="recap-quip"><span class="tag">[内陆帝国]</span>${escapeHtml(generateQuip(stats))}</div>
     </div>
     <div class="hint-text" style="margin-top:10px;">截图保存这张卡片，发给朋友炫耀一下也行～</div>
+    <div class="purchase-section" style="margin-top:20px;">
+      <div class="purchase-section-head"><span>口味总览（${rangeLabel}）</span></div>
+      ${filtered.length ? `<div style="display:flex;justify-content:center;">${fingerprintSVG(avgFingerprint, 160, true)}</div>` : `<div class="hint-text">这个区间还没有测评数据。</div>`}
+    </div>
+    <div class="purchase-section" style="margin-top:20px;">
+      <div class="purchase-section-head"><span>你的全部称号</span></div>
+      ${(() => {
+        const titles = getTitles(personalEntries);
+        if(!titles.length) return `<div class="hint-text">还没解锁任何称号，多测评几款就会出现在这里。</div>`;
+        return `<div class="tag-picker">${titles.map(t=>`<div class="tag-chip active">${escapeHtml(t)}</div>`).join('')}</div>
+        <div class="hint-text" style="margin-top:8px;">去"设置"里可以挑一个挂在共享区昵称旁边。</div>`;
+      })()}
+    </div>
   `;
   overlay.classList.add('open');
   document.getElementById('closePanel').addEventListener('click', closePanel);
@@ -1962,12 +2010,13 @@ async function openGraveyardPanel(){
         <div class="grave-card">
           <div class="grave-name">${escapeHtml(item.name)}${item.brand?' · '+escapeHtml(item.brand):''}</div>
           <div class="grave-meta">${item.boughtDate||'日期不明'} → ${item.finishedDate} · 综合 ${item.score.toFixed(1)}</div>
+          ${item.epitaph ? `<div class="grave-eulogy" style="font-style:italic;margin-bottom:6px;">"${escapeHtml(item.epitaph)}"</div>` : ''}
           <div class="grave-eulogy">${eulogyText(item)}</div>
         </div>`).join('')}
     </div>` : `
     <div class="empty">
       ${emptyCloudSVG}
-      <h3>还没有退役的电子烟</h3>
+      <h3>还没有退役的烟弹</h3>
       <p>在详情页把某一根标记为"抽完"，它就会被记在这里</p>
     </div>`}
   `;
@@ -2007,6 +2056,28 @@ function brandMax(es){
   });
   const vals = Object.values(counts);
   return vals.length ? Math.max(...vals) : 0;
+}
+
+/* ---------- titles (multiple can be earned, user picks one to display) ---------- */
+function getTitles(es){
+  const titles = [];
+  if(es.length < 5) return titles;
+  const avg = (field) => es.reduce((s,e)=>s+(Number(e[field])||0),0) / es.length;
+  const avgScore = es.reduce((s,e)=>s+(Number(e.score)||0),0) / es.length;
+  if(avg('subIce') >= 4) titles.push('[薄荷神经元]');
+  if(avg('subVapor') >= 4) titles.push('[肺活量崇拜]');
+  if(avg('subSmooth') >= 4) titles.push('[无摩擦主义者]');
+  if(avg('subThroat') >= 4) titles.push('[痛觉爱好者]');
+  if(avgScore <= 4) titles.push('[审判官人格]');
+  if(avgScore >= 8) titles.push('[无差别赐福]');
+  if(brandMax(es) >= 5) titles.push('[单一信仰]');
+  if(es.length >= 20) titles.push('[数据殖民者]');
+  const nightCount = es.filter(e=>{
+    const h = new Date(e.createdAt||0).getHours();
+    return h>=0 && h<5;
+  }).length;
+  if(nightCount >= 3) titles.push('[夜行观察者]');
+  return titles;
 }
 
 const RARITY_TIER_NAMES = ['戒断反射','凡夫俗子','小型觉醒','灵魂共振','电子涅槃'];
