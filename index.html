@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -612,6 +612,37 @@ select.sort-select{
 }
 .achv-modal-save-btn:hover{background:rgba(255,255,255,0.14);}
 
+.achv-export-card{
+  position:fixed;top:0;left:-9999px;width:320px;
+  padding:32px 26px;border-radius:20px;
+  background:radial-gradient(circle at 30% 20%, #2A1830, #170F1A 60%);
+  color:#F0EAEE;
+  text-align:center;
+  border:1px solid rgba(255,255,255,0.15);
+}
+.achv-export-bracket{ position:absolute; width:16px; height:16px; border-color:rgba(255,255,255,0.35); }
+.achv-export-bracket.tl{ top:10px; left:10px; border-top:2px solid; border-left:2px solid; }
+.achv-export-bracket.br{ bottom:10px; right:10px; border-bottom:2px solid; border-right:2px solid; }
+.achv-export-eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:0.16em;text-transform:uppercase;color:#D97DB0;margin-bottom:16px;
+}
+.achv-export-tag{
+  display:block;font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;
+  color:#F0EAEE;margin-bottom:6px;
+}
+.achv-export-main{
+  display:block;font-family:'Inter',sans-serif;font-size:14px;
+  color:rgba(240,234,238,0.8);line-height:1.5;
+}
+.achv-export-desc{
+  font-size:13px;color:rgba(240,234,238,0.65);line-height:1.6;margin-top:14px;
+}
+.achv-export-footer{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(240,234,238,0.4);
+  letter-spacing:0.05em;margin-top:18px;
+}
+
 .recap-outer{
   position:relative;
   border-radius:20px;
@@ -908,7 +939,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -2361,6 +2392,12 @@ function formatAchvTitle(title){
   return `<span class="achv-modal-title-tag">${escapeHtml(m[1])}</span><span class="achv-modal-title-main">${escapeHtml(m[2])}</span>`;
 }
 
+function formatAchvExportTitle(title){
+  const m = title.match(/^(\[[^\]]+\])\s*(.*)$/);
+  if(!m) return escapeHtml(title);
+  return `<span class="achv-export-tag">${escapeHtml(m[1])}</span><span class="achv-export-main">${escapeHtml(m[2])}</span>`;
+}
+
 function showNextAchvModal(){
   if(achvShowing && !document.querySelector('.achv-modal-overlay')) achvShowing = false;
   if(achvShowing || !achvQueue.length) return;
@@ -2394,19 +2431,29 @@ function showNextAchvModal(){
     }, 240);
   };
   modal.querySelector('.achv-modal-btn').addEventListener('click', close);
-  modal.querySelector('.achv-modal-save-btn').addEventListener('click', ()=> exportAchvCard(modal.querySelector('.achv-modal-card')));
+  modal.querySelector('.achv-modal-save-btn').addEventListener('click', ()=> exportAchvImage(a));
   modal.addEventListener('click', e=>{ if(e.target === modal) close(); });
 }
 
-async function exportAchvCard(card){
+async function exportAchvImage(a){
   if(typeof html2canvas === 'undefined'){
     showToast('分享卡组件加载失败，检查一下网络');
     return;
   }
-  const actions = card.querySelector('.achv-modal-actions');
-  if(actions) actions.style.visibility = 'hidden';
+  const card = document.createElement('div');
+  card.className = 'achv-export-card';
+  card.innerHTML = `
+    <div class="achv-export-bracket tl"></div>
+    <div class="achv-export-bracket br"></div>
+    <div class="achv-export-eyebrow">成 就 解 锁</div>
+    ${formatAchvExportTitle(a.title)}
+    ${a.flavor ? `<div class="achv-export-desc">${escapeHtml(a.flavor)}</div>` : ''}
+    <div class="achv-export-footer">仿生人会梦见电子烟吗</div>
+  `;
+  document.body.appendChild(card);
+  await new Promise(r => requestAnimationFrame(()=> requestAnimationFrame(r)));
   try{
-    const canvas = await html2canvas(card, { backgroundColor: '#0C0810', scale: 2 });
+    const canvas = await html2canvas(card, { backgroundColor: '#170F1A', scale: 2 });
     const link = document.createElement('a');
     link.download = '成就解锁.png';
     link.href = canvas.toDataURL('image/png');
@@ -2415,7 +2462,7 @@ async function exportAchvCard(card){
   }catch(err){
     showToast('导出失败：' + (err.message || '未知错误'));
   }finally{
-    if(actions) actions.style.visibility = 'visible';
+    card.remove();
   }
 }
 
@@ -2430,6 +2477,31 @@ async function getPersonalEntriesForAchievements(){
     showToast('加载成就数据失败：' + (e.message || '网络问题'));
     return [];
   }
+}
+
+function previewAchvModal(a){
+  const modal = document.createElement('div');
+  modal.className = 'achv-modal-overlay';
+  modal.innerHTML = `
+    <div class="achv-modal-card">
+      <div class="recap-grid-noise"></div>
+      <div class="recap-scanlines"></div>
+      <div class="recap-bracket tl"></div>
+      <div class="recap-bracket br"></div>
+      <div class="achv-modal-eyebrow">成 就 解 锁</div>
+      <div class="achv-modal-title">${formatAchvTitle(a.title)}</div>
+      <div class="achv-modal-desc">${a.flavor || ''}</div>
+      <button class="achv-modal-btn" type="button">好耶</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  requestAnimationFrame(()=> modal.classList.add('show'));
+  const close = ()=>{
+    modal.classList.remove('show');
+    setTimeout(()=> modal.remove(), 240);
+  };
+  modal.querySelector('.achv-modal-btn').addEventListener('click', close);
+  modal.addEventListener('click', e=>{ if(e.target === modal) close(); });
 }
 
 async function openAchievementsPanel(){
@@ -2450,7 +2522,7 @@ async function openAchievementsPanel(){
           ${unlocked ? `<div class="badge-title">${a.title}</div>` : `<div class="badge-redacted"></div>`}
           <div class="badge-desc">${a.desc}</div>
           <div class="badge-progress">${unlocked ? '已解锁' : a.progress(personalEntries)}</div>
-          ${unlocked ? `<button type="button" class="mini-btn badge-export-btn" data-id="${a.id}" style="margin-top:8px;">生成图片</button>` : ''}
+          ${unlocked ? `<div style="display:flex;gap:6px;margin-top:8px;"><button type="button" class="mini-btn badge-export-btn" data-id="${a.id}">自动保存</button><button type="button" class="mini-btn badge-preview-btn" data-id="${a.id}">查看大图</button></div>` : ''}
         </div>`;
       }).join('')}
     </div>
@@ -2463,7 +2535,7 @@ async function openAchievementsPanel(){
           ${unlocked ? `<div class="badge-title">${a.title}</div>` : `<div class="badge-redacted"></div>`}
           <div class="badge-desc">${unlocked ? a.desc : '？？？'}</div>
           <div class="badge-progress">${unlocked ? '已解锁' : '未知'}</div>
-          ${unlocked ? `<button type="button" class="mini-btn badge-export-btn" data-id="${a.id}" style="margin-top:8px;">生成图片</button>` : ''}
+          ${unlocked ? `<div style="display:flex;gap:6px;margin-top:8px;"><button type="button" class="mini-btn badge-export-btn" data-id="${a.id}">自动保存</button><button type="button" class="mini-btn badge-preview-btn" data-id="${a.id}">查看大图</button></div>` : ''}
         </div>`;
       }).join('')}
     </div>
@@ -2473,43 +2545,17 @@ async function openAchievementsPanel(){
   panel.querySelectorAll('.badge-export-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const a = ALL_ACHIEVEMENTS.find(x=>x.id===btn.dataset.id);
-      if(a) exportAchvBadgeCard(a);
+      if(a) exportAchvImage(a);
+    });
+  });
+  panel.querySelectorAll('.badge-preview-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const a = ALL_ACHIEVEMENTS.find(x=>x.id===btn.dataset.id);
+      if(a) previewAchvModal(a);
     });
   });
 }
 
-async function exportAchvBadgeCard(a){
-  if(typeof html2canvas === 'undefined'){
-    showToast('分享卡组件加载失败，检查一下网络');
-    return;
-  }
-  const card = document.createElement('div');
-  card.className = 'achv-modal-card';
-  card.style.cssText = 'position:fixed;top:0;left:-9999px;width:320px;';
-  card.innerHTML = `
-    <div class="recap-grid-noise"></div>
-    <div class="recap-scanlines"></div>
-    <div class="recap-bracket tl"></div>
-    <div class="recap-bracket br"></div>
-    <div class="achv-modal-eyebrow">成 就 解 锁</div>
-    <div class="achv-modal-title">${formatAchvTitle(a.title)}</div>
-    <div class="achv-modal-desc">${a.flavor || ''}</div>
-  `;
-  document.body.appendChild(card);
-  await new Promise(r => requestAnimationFrame(()=> requestAnimationFrame(r)));
-  try{
-    const canvas = await html2canvas(card, { backgroundColor: '#0C0810', scale: 2 });
-    const link = document.createElement('a');
-    link.download = '成就解锁.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    showToast('已保存成就图片');
-  }catch(err){
-    showToast('导出失败：' + (err.message || '未知错误'));
-  }finally{
-    card.remove();
-  }
-}
 document.getElementById('addBtn').addEventListener('click', openAddPanel);
 document.getElementById('themeBtn').addEventListener('click', toggleTheme);
 document.getElementById('searchInput').addEventListener('input', render);
