@@ -2406,7 +2406,7 @@ async function exportAchvCard(card){
   const actions = card.querySelector('.achv-modal-actions');
   if(actions) actions.style.visibility = 'hidden';
   try{
-    const canvas = await html2canvas(card, { backgroundColor: null, scale: 2 });
+    const canvas = await html2canvas(card, { backgroundColor: '#0C0810', scale: 2 });
     const link = document.createElement('a');
     link.download = '成就解锁.png';
     link.href = canvas.toDataURL('image/png');
@@ -2485,9 +2485,7 @@ async function exportAchvBadgeCard(a){
   }
   const card = document.createElement('div');
   card.className = 'achv-modal-card';
-  card.style.position = 'fixed';
-  card.style.left = '-9999px';
-  card.style.top = '0';
+  card.style.cssText = 'position:fixed;top:0;left:0;width:320px;opacity:0;pointer-events:none;z-index:-1;';
   card.innerHTML = `
     <div class="recap-grid-noise"></div>
     <div class="recap-scanlines"></div>
@@ -2498,8 +2496,9 @@ async function exportAchvBadgeCard(a){
     <div class="achv-modal-desc">${a.flavor || ''}</div>
   `;
   document.body.appendChild(card);
+  await new Promise(r => requestAnimationFrame(()=> requestAnimationFrame(r)));
   try{
-    const canvas = await html2canvas(card, { backgroundColor: null, scale: 2 });
+    const canvas = await html2canvas(card, { backgroundColor: '#0C0810', scale: 2 });
     const link = document.createElement('a');
     link.download = '成就解锁.png';
     link.href = canvas.toDataURL('image/png');
