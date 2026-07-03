@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -204,6 +204,32 @@ select.sort-select{
 
 .tag-picker{display:flex;flex-wrap:wrap;gap:6px;}
 .tag-picker .tag-chip{margin:0;}
+
+.word-cloud{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:center;padding:8px 4px;}
+.word-cloud span{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--ink);line-height:1.3;}
+
+.rarity-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.rarity-bar-name{font-size:12px;font-family:'IBM Plex Mono',monospace;width:76px;flex:none;color:var(--muted);}
+.rarity-bar-track{flex:1;height:8px;border-radius:999px;background:var(--paper-soft);overflow:hidden;}
+.rarity-bar-fill{height:100%;border-radius:999px;}
+.rarity-bar-count{font-size:12px;font-family:'IBM Plex Mono',monospace;width:24px;flex:none;text-align:right;color:var(--ink);}
+
+.export-card{
+  position:fixed;left:-9999px;top:0;
+  width:340px;padding:28px 24px;
+  background:var(--paper);border-radius:20px;
+  font-family:'Inter',sans-serif;
+  text-align:center;
+}
+.export-ident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:6px;}
+.export-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--ink);}
+.export-brand{font-size:13px;color:var(--muted);margin-bottom:14px;}
+.export-fp{display:flex;justify-content:center;margin-bottom:14px;}
+.export-score{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink);margin-bottom:10px;}
+.export-flavor{font-size:12.5px;color:var(--ink);margin-bottom:12px;line-height:1.5;}
+.export-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px;}
+.export-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 8px;border-radius:999px;background:var(--paper-soft);color:var(--muted);}
+.export-footer{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.05em;margin-top:8px;}
 
 /* ---- grid ---- */
 .grid{
@@ -823,7 +849,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -871,6 +897,7 @@ select.sort-select{
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 const SWATCHES = ['#E9C46A','#F4A261','#E76F51','#8AB17D','#5B8C85','#6C7FB8','#B07CC6','#D9D9D9'];
 const SUPABASE_URL = 'https://zrwjpnjnqlqxbzisxvgs.supabase.co';
@@ -961,6 +988,40 @@ function entryIdentCode(e){
   const idx = sorted.findIndex(x=>String(x.id)===String(e.id));
   const num = idx>=0 ? idx+1 : sorted.length+1;
   return '识别码 · ' + String(num).padStart(4,'0');
+}
+
+async function exportShareCard(e){
+  if(typeof html2canvas === 'undefined'){
+    showToast('分享卡组件加载失败，检查一下网络');
+    return;
+  }
+  const tier = rarityTier(e.score);
+  const card = document.createElement('div');
+  card.className = 'export-card';
+  card.style.cssText = rarityBorderStyle(e.score) + 'border-width:2px;';
+  card.innerHTML = `
+    <div class="export-ident">${escapeHtml(entryIdentCode(e))}</div>
+    <div class="export-name">${escapeHtml(e.name||'未命名')}</div>
+    <div class="export-brand">${escapeHtml(e.brand||'')}</div>
+    <div class="export-fp">${fingerprintSVG(e, 180, true)}</div>
+    <div class="export-score">综合 ${(Number(e.score)||0).toFixed(1)} · ${escapeHtml(tier.name)}</div>
+    ${e.flavor ? `<div class="export-flavor">${escapeHtml(e.flavor)}</div>` : ''}
+    ${(e.tags||[]).length ? `<div class="export-tags">${(e.tags||[]).map(t=>`<span class="export-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+    <div class="export-footer">仿生人会梦见电子烟吗</div>
+  `;
+  document.body.appendChild(card);
+  try{
+    const canvas = await html2canvas(card, { backgroundColor: null, scale: 2 });
+    const link = document.createElement('a');
+    link.download = `${(e.name||'测评').replace(/[\\/:*?"<>|]/g,'')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('已保存分享卡图片');
+  }catch(err){
+    showToast('导出失败：' + (err.message || '未知错误'));
+  }finally{
+    card.remove();
+  }
 }
 
 function unboxPipeSVG(){
@@ -1274,10 +1335,9 @@ function allTags(){
 }
 
 const PRESET_TAGS = [
-  '水果','薄荷','烟草','甜品','饮料','花香','混合口味',
-  '冰感','顺滑','呛喉','回甘','后劲强',
-  '办公室','深夜','追剧','户外','通勤',
-  '一次性','换弹','限量款','断货难买','高性价比'
+  '水果','薄荷','饮料','混合口味','茶类',
+  '冰感','顺滑','呛喉','香精味',
+  '一次性','烟弹','高性价比','踩雷','回购首选','透明仓','热门','越抽越没味'
 ];
 
 function renderTagRow(){
@@ -1469,6 +1529,7 @@ function openDetailPanel(id){
           </div>
         </div>`).join('')}
     </div>` : ''}
+    <button type="button" class="photo-btn" id="exportCardBtn" style="width:100%;margin-bottom:14px;">生成分享卡（保存到相册）</button>
     <div class="panel-actions">
       ${editable ? `<button class="btn-danger" id="deleteBtn">删除这条记录</button>` : `<div></div>`}
       ${editable ? `<button class="btn-save" id="editBtn">编辑</button>` : `<div></div>`}
@@ -1476,6 +1537,7 @@ function openDetailPanel(id){
   `;
   overlay.classList.add('open');
   document.getElementById('closePanel').addEventListener('click', closePanel);
+  document.getElementById('exportCardBtn').addEventListener('click', ()=> exportShareCard(e));
   if(editable){
     document.getElementById('deleteBtn').addEventListener('click', ()=> deleteEntry(e.id));
     document.getElementById('editBtn').addEventListener('click', ()=> openEditPanel(e.id));
@@ -1938,6 +2000,55 @@ async function openRecapPanel(range){
   renderRecapPanel(personalEntries, range || 'quarter');
 }
 
+/* ---------- word cloud (tags + flavor text, lightweight bigram approach) ---------- */
+const WORDCLOUD_STOPWORDS = new Set(['的','了','是','有点','非常','比较','一点','还是','就是','感觉','但是','然后','而且','这个','那个','一般','其实','特别','稍微','有些','很像','好像','就像','味道','没有','有种','一种','这种','那种']);
+function extractWordCloudTerms(es){
+  const freq = {};
+  const addTerm = (term, weight) => {
+    term = term.trim();
+    if(!term) return;
+    freq[term] = (freq[term]||0) + weight;
+  };
+  es.forEach(e=>{
+    (e.tags||[]).forEach(t=> addTerm(t, 3));
+    const flavor = (e.flavor||'').replace(/[，。、！？~～\s,.!?()（）]/g,'');
+    for(let i=0;i<flavor.length-1;i++){
+      const bigram = flavor.slice(i,i+2);
+      if(WORDCLOUD_STOPWORDS.has(bigram)) continue;
+      if(!/[\u4e00-\u9fa5]/.test(bigram)) continue;
+      addTerm(bigram, 1);
+    }
+  });
+  return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,30);
+}
+function wordCloudHTML(es){
+  const terms = extractWordCloudTerms(es);
+  if(!terms.length) return `<div class="hint-text">还没有足够的口味描述和标签。</div>`;
+  const maxCount = terms[0][1];
+  const minCount = terms[terms.length-1][1];
+  const range = maxCount - minCount || 1;
+  return `<div class="word-cloud">${terms.map(([word,count])=>{
+    const t = (count - minCount) / range;
+    const fontSize = 12 + t*20;
+    const opacity = 0.55 + t*0.45;
+    return `<span style="font-size:${fontSize.toFixed(0)}px;opacity:${opacity.toFixed(2)};">${escapeHtml(word)}</span>`;
+  }).join('')}</div>`;
+}
+
+function rarityCounts(es){
+  const counts = {};
+  RARITY_TIER_NAMES.forEach(t=>counts[t]=0);
+  es.forEach(e=>{
+    const t = rarityTier(e.score).name;
+    counts[t] = (counts[t]||0)+1;
+  });
+  return counts;
+}
+function rarityBarColor(tierName){
+  const dummy = { score: tierName==='电子涅槃'?10:tierName==='灵魂共振'?9:tierName==='小型觉醒'?7.5:tierName==='凡夫俗子'?6:4 };
+  return rarityTier(dummy.score);
+}
+
 function renderRecapPanel(personalEntries, range){
   const filtered = filterByRange(personalEntries, range);
   const stats = computeRecapStats(filtered);
@@ -1979,6 +2090,30 @@ function renderRecapPanel(personalEntries, range){
       <div class="purchase-section-head"><span>口味总览（${rangeLabel}）</span></div>
       ${filtered.length ? `<div style="display:flex;justify-content:center;">${fingerprintSVG(avgFingerprint, 160, true)}</div>` : `<div class="hint-text">这个区间还没有测评数据。</div>`}
     </div>
+    <div class="purchase-section">
+      <div class="purchase-section-head"><span>常出现的词（${rangeLabel}）</span></div>
+      ${wordCloudHTML(filtered)}
+    </div>
+    <div class="purchase-section" style="margin-top:20px;">
+      <div class="purchase-section-head"><span>稀有度图鉴</span></div>
+      ${(() => {
+        const counts = rarityCounts(personalEntries);
+        const maxCount = Math.max(1, ...RARITY_TIER_NAMES.map(t=>counts[t]));
+        return RARITY_TIER_NAMES.map(t=>{
+          const c = counts[t];
+          const tier = rarityBarColor(t);
+          const pct = Math.round((c/maxCount)*100);
+          const fillStyle = tier.rainbow
+            ? `background-image:linear-gradient(90deg,#D4537E,#9333EA,#378ADD,#639922,#BA7517);width:${pct}%;`
+            : `background:${tier.color};width:${pct}%;`;
+          return `<div class="rarity-bar-row">
+            <div class="rarity-bar-name">${escapeHtml(t)}</div>
+            <div class="rarity-bar-track"><div class="rarity-bar-fill" style="${fillStyle}"></div></div>
+            <div class="rarity-bar-count">${c}</div>
+          </div>`;
+        }).join('');
+      })()}
+    </div>
     <div class="purchase-section" style="margin-top:20px;">
       <div class="purchase-section-head"><span>你的全部称号</span></div>
       ${(() => {
@@ -2016,7 +2151,7 @@ async function openGraveyardPanel(){
     </div>` : `
     <div class="empty">
       ${emptyCloudSVG}
-      <h3>还没有退役的电子烟</h3>
+      <h3>还没有退役的烟弹</h3>
       <p>在详情页把某一根标记为"抽完"，它就会被记在这里</p>
     </div>`}
   `;
