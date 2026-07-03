@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -230,6 +230,13 @@ select.sort-select{
 .export-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px;}
 .export-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 8px;border-radius:999px;background:var(--paper-soft);color:var(--muted);}
 .export-footer{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.05em;margin-top:8px;}
+
+.export-subscores{margin-bottom:12px;text-align:left;}
+.export-subrow{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0;color:var(--ink);}
+.export-subrow span:first-child{color:var(--muted);}
+.export-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;text-align:left;margin-bottom:12px;font-size:12px;}
+.export-meta-grid div span{display:block;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;margin-bottom:2px;}
+.export-notes{font-size:12px;color:var(--ink);text-align:left;line-height:1.5;margin-bottom:12px;padding:8px 10px;background:var(--paper-soft);border-radius:8px;}
 
 /* ---- grid ---- */
 .grid{
@@ -849,7 +856,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -990,7 +997,7 @@ function entryIdentCode(e){
   return '识别码 · ' + String(num).padStart(4,'0');
 }
 
-async function exportShareCard(e){
+async function exportShareCard(e, detailed){
   if(typeof html2canvas === 'undefined'){
     showToast('分享卡组件加载失败，检查一下网络');
     return;
@@ -999,6 +1006,22 @@ async function exportShareCard(e){
   const card = document.createElement('div');
   card.className = 'export-card';
   card.style.cssText = rarityBorderStyle(e.score) + 'border-width:2px;';
+  const detailedExtra = detailed ? `
+    <div class="export-subscores">
+      <div class="export-subrow"><span>口味</span><span>${e.subSweet||0}</span></div>
+      <div class="export-subrow"><span>冰感</span><span>${e.subIce||0}</span></div>
+      <div class="export-subrow"><span>烟雾量</span><span>${e.subVapor||0}</span></div>
+      <div class="export-subrow"><span>顺滑度</span><span>${e.subSmooth||0}</span></div>
+      <div class="export-subrow"><span>击喉感</span><span>${e.subThroat||0}</span></div>
+    </div>
+    <div class="export-meta-grid">
+      <div><span>价格</span>${e.price?('¥'+e.price):'—'}</div>
+      <div><span>额定 Puffs</span>${e.puffs||'—'}</div>
+      <div><span>入手日期</span>${e.dateTried||'—'}</div>
+      <div><span>回购意愿</span>${e.rebuy||'—'}</div>
+    </div>
+    ${e.notes ? `<div class="export-notes">${escapeHtml(e.notes)}</div>` : ''}
+  ` : '';
   card.innerHTML = `
     <div class="export-ident">${escapeHtml(entryIdentCode(e))}</div>
     <div class="export-name">${escapeHtml(e.name||'未命名')}</div>
@@ -1007,13 +1030,14 @@ async function exportShareCard(e){
     <div class="export-score">综合 ${(Number(e.score)||0).toFixed(1)} · ${escapeHtml(tier.name)}</div>
     ${e.flavor ? `<div class="export-flavor">${escapeHtml(e.flavor)}</div>` : ''}
     ${(e.tags||[]).length ? `<div class="export-tags">${(e.tags||[]).map(t=>`<span class="export-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+    ${detailedExtra}
     <div class="export-footer">仿生人会梦见电子烟吗</div>
   `;
   document.body.appendChild(card);
   try{
     const canvas = await html2canvas(card, { backgroundColor: null, scale: 2 });
     const link = document.createElement('a');
-    link.download = `${(e.name||'测评').replace(/[\\/:*?"<>|]/g,'')}.png`;
+    link.download = `${(e.name||'测评').replace(/[\\/:*?"<>|]/g,'')}${detailed?'-详细版':''}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
     showToast('已保存分享卡图片');
@@ -1529,7 +1553,10 @@ function openDetailPanel(id){
           </div>
         </div>`).join('')}
     </div>` : ''}
-    <button type="button" class="photo-btn" id="exportCardBtn" style="width:100%;margin-bottom:14px;">生成分享卡（保存到相册）</button>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button type="button" class="photo-btn" id="exportCardBtn" style="flex:1;">生成分享卡</button>
+      <button type="button" class="photo-btn" id="exportCardDetailedBtn" style="flex:1;">生成详细版</button>
+    </div>
     <div class="panel-actions">
       ${editable ? `<button class="btn-danger" id="deleteBtn">删除这条记录</button>` : `<div></div>`}
       ${editable ? `<button class="btn-save" id="editBtn">编辑</button>` : `<div></div>`}
@@ -1537,7 +1564,8 @@ function openDetailPanel(id){
   `;
   overlay.classList.add('open');
   document.getElementById('closePanel').addEventListener('click', closePanel);
-  document.getElementById('exportCardBtn').addEventListener('click', ()=> exportShareCard(e));
+  document.getElementById('exportCardBtn').addEventListener('click', ()=> exportShareCard(e, false));
+  document.getElementById('exportCardDetailedBtn').addEventListener('click', ()=> exportShareCard(e, true));
   if(editable){
     document.getElementById('deleteBtn').addEventListener('click', ()=> deleteEntry(e.id));
     document.getElementById('editBtn').addEventListener('click', ()=> openEditPanel(e.id));
