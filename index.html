@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -993,7 +993,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -2357,7 +2357,9 @@ async function openTimelinePanel(){
       <div class="timeline-line"></div>
       ${sorted.map((e,i)=>{
         const tier = rarityTier(e.score);
-        const dotColor = tier.rainbow ? '#BA7517' : tier.color;
+        const dotStyle = tier.rainbow
+          ? 'background:conic-gradient(#D4537E,#9333EA,#378ADD,#639922,#BA7517,#D4537E);'
+          : `background:${tier.color};`;
         const dateStr = e.createdAt ? new Date(e.createdAt).toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'}) : '日期不明';
         let gapHtml = '';
         if(i>0 && e.createdAt && sorted[i-1].createdAt){
@@ -2366,7 +2368,7 @@ async function openTimelinePanel(){
         }
         return `
         <div class="timeline-item">
-          <div class="timeline-dot" style="background:${dotColor};"></div>
+          <div class="timeline-dot" style="${dotStyle}"></div>
           <div class="timeline-date">${dateStr}</div>
           <div class="timeline-card">
             <div class="timeline-name">${escapeHtml(e.name||'未命名')}</div>
