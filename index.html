@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -983,7 +983,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式" style="font-size:15px;">🌙</div>
@@ -2279,6 +2279,19 @@ function renderRecapPanel(personalEntries, range){
         }).join('')}
 
         <div class="recap-divider"></div>
+        <div class="recap-section-label">品 牌 忠 诚 度</div>
+        ${(() => {
+          const top = topBrandInfo(personalEntries);
+          if(!top.name) return `<div class="hint-text" style="margin-bottom:6px;">还没有足够的品牌数据。</div>`;
+          const pct = Math.min(100, Math.round((top.count/4)*100));
+          return `<div class="rarity-bar-row">
+            <div class="rarity-bar-name">${escapeHtml(top.name)}</div>
+            <div class="rarity-bar-track"><div class="rarity-bar-fill" style="background:${document.documentElement.getAttribute('data-theme')==='dark'?'#A855F7':'#9333EA'};width:${pct}%;"></div></div>
+            <div class="rarity-bar-count">${Math.min(top.count,4)} / 4</div>
+          </div>`;
+        })()}
+
+        <div class="recap-divider"></div>
         <div class="recap-section-label">称 号</div>
         ${titles.length
           ? `<div class="tag-picker" style="margin-bottom:6px;">${titles.map(t=>`<div class="tag-chip active">${escapeHtml(t)}</div>`).join('')}</div>`
@@ -2316,7 +2329,7 @@ async function openGraveyardPanel(){
     </div>` : `
     <div class="empty">
       ${emptyCloudSVG}
-      <h3>还没有退役的电子烟</h3>
+      <h3>还没有退役的烟弹</h3>
       <p>在详情页把某一根标记为"抽完"，它就会被记在这里</p>
     </div>`}
   `;
@@ -2357,6 +2370,16 @@ function brandMax(es){
   const vals = Object.values(counts);
   return vals.length ? Math.max(...vals) : 0;
 }
+function topBrandInfo(es){
+  const counts = {};
+  es.forEach(e=>{
+    const b = (e.brand||'').trim();
+    if(b) counts[b] = (counts[b]||0) + 1;
+  });
+  let best = null, bestCount = 0;
+  Object.entries(counts).forEach(([b,c])=>{ if(c>bestCount){ best=b; bestCount=c; } });
+  return { name: best, count: bestCount };
+}
 
 /* ---------- titles (multiple can be earned, user picks one to display) ---------- */
 function getTitles(es){
@@ -2370,7 +2393,7 @@ function getTitles(es){
   if(avg('subThroat') >= 4) titles.push('[痛觉爱好者]');
   if(avgScore <= 4) titles.push('[审判官人格]');
   if(avgScore >= 8) titles.push('[无差别赐福]');
-  if(brandMax(es) >= 5) titles.push('[单一信仰]');
+  if(brandMax(es) >= 4) titles.push('[单一信仰]');
   if(es.length >= 20) titles.push('[数据殖民者]');
   const nightCount = es.filter(e=>{
     const h = new Date(e.createdAt||0).getHours();
@@ -2390,7 +2413,11 @@ const HIDDEN_ACHIEVEMENTS = [
   { id:'spectrum_full', title:'[光谱全览] 五种颜色都尝过了', icon:'🌈', desc:'集齐五档稀有度各一款',
     flavor:'从灰扑扑的戒断反射到彩光流转的电子涅槃，你的舌头没有偏见，只有好奇心压过了理智。',
     check:(es)=> rarityTiersOwned(es).length>=5,
-    progress:(es)=> rarityTiersOwned(es).length+' / 5' }
+    progress:(es)=> rarityTiersOwned(es).length+' / 5' },
+  { id:'funeral_regular', title:'[葬礼常客] 你已经很熟练了', icon:'⚰️', desc:'纪念馆里累计送走 10 根烟弹',
+    flavor:'你数到十的时候，肺已经默默扣了你的绩效。',
+    check:(es)=> getGraveyardEntries(es).length>=10,
+    progress:(es)=> Math.min(getGraveyardEntries(es).length,10)+' / 10' }
 ];
 const ALL_ACHIEVEMENTS = [...ACHIEVEMENTS, ...HIDDEN_ACHIEVEMENTS];
 
