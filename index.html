@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -1041,6 +1041,13 @@ select.sort-select{
   padding:8px 10px;margin-bottom:6px;font-size:12.5px;
 }
 .purchase-row-dates{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.purchase-date-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.date-precision-toggle{
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;text-decoration:underline;padding:0;text-align:left;
+}
+.date-precision-toggle:disabled{opacity:0.4;cursor:default;text-decoration:none;}
 .purchase-row-actions{display:flex;justify-content:flex-end;gap:6px;}
 .purchase-row input[type="date"]{
   font-family:'IBM Plex Mono',monospace;font-size:12px;
@@ -1101,6 +1108,13 @@ select.sort-select{
 .tombstone-entries{display:flex;flex-direction:column;gap:14px;}
 .tombstone-entry-date{font-size:10.5px;color:#3A6954;font-family:'IBM Plex Mono',monospace;text-align:center;letter-spacing:0.03em;margin:0 0 4px;}
 [data-theme="dark"] .tombstone-entry-date{color:#A8DFC5;}
+.tombstone-entry-unknown{
+  border:1px dashed var(--glass-border);
+  border-radius:8px;
+  padding:8px;
+}
+.tombstone-entry-unknown .tombstone-entry-date{color:var(--muted);}
+.tombstone-entry-unknown .tombstone-entry-eulogy{opacity:0.8;}
 .tombstone-entry-epitaph{font-size:12px;color:var(--ink);text-align:center;font-style:italic;margin:0 0 4px;line-height:1.5;}
 .tombstone-entry-eulogy{font-size:11.5px;color:var(--ink);text-align:center;font-style:italic;line-height:1.5;opacity:0.85;}
 
@@ -1151,7 +1165,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -1448,6 +1462,17 @@ function rarityBorderStyleForExport(score){
 }
 
 /* ---------- purchase records (per-unit bought/finished tracking) ---------- */
+function isFullDate(str){ return /^\d{4}-\d{2}-\d{2}$/.test(str||''); }
+function isMonthOnly(str){ return /^\d{4}-\d{2}$/.test(str||''); }
+function formatFuzzyDate(str){
+  if(!str) return '日期不明';
+  if(isMonthOnly(str)){
+    const [y,m] = str.split('-');
+    return `${y}年${Number(m)}月`;
+  }
+  return str;
+}
+
 function getPurchases(e){
   if(Array.isArray(e.purchases)) return e.purchases;
   const count = e.purchaseCount || 1;
@@ -1475,9 +1500,9 @@ async function savePurchases(e, purchases, toastMsg){
 }
 
 async function addNewPurchase(e){
-  const input = prompt('购入日期（YYYY-MM-DD），留空默认今天', new Date().toISOString().slice(0,10));
+  const input = prompt('购入日期（YYYY-MM-DD 或 YYYY-MM，留空表示日期不明）', new Date().toISOString().slice(0,10));
   if(input === null) return;
-  const boughtDate = input.trim() || new Date().toISOString().slice(0,10);
+  const boughtDate = input.trim();
   const purchases = getPurchases(e).map(p=>({...p}));
   purchases.push({ id: 'p'+Date.now(), boughtDate, finishedDate: null });
   await savePurchases(e, purchases, '已记录新的一根');
@@ -1497,7 +1522,7 @@ function getGraveyardEntries(entriesList){
     getPurchases(e).forEach(p=>{
       if(p.finishedDate){
         list.push({
-          purchaseId: p.id, entryId: e.id, name: e.name||'未命名', brand: e.brand||'',
+          purchaseId: p.id, entryId: e.id, name: e.name||'未命名', brand: e.brand||'', flavor: e.flavor||'',
           score: Number(e.score)||0, boughtDate: p.boughtDate||'', finishedDate: p.finishedDate,
           epitaph: p.epitaph||''
         });
@@ -1508,8 +1533,20 @@ function getGraveyardEntries(entriesList){
   return list;
 }
 
+const UNKNOWN_DATE_LINES = [
+  '[无名冢] 记忆里空了一块',
+  '[无名冢] 时间在这里打了个哈欠',
+  '[无名冢] 日子被弄丢了',
+  '[无名冢] 这一段，谁都想不起来'
+];
+function unknownDateLine(purchaseId){
+  let hash = 0;
+  for(const c of String(purchaseId)) hash = (hash*31 + c.charCodeAt(0)) | 0;
+  return UNKNOWN_DATE_LINES[Math.abs(hash) % UNKNOWN_DATE_LINES.length];
+}
+
 function eulogyText(item){
-  const hasDays = item.boughtDate && item.finishedDate;
+  const hasDays = isFullDate(item.boughtDate) && isFullDate(item.finishedDate);
   const days = hasDays ? Math.max(0, Math.round((new Date(item.finishedDate)-new Date(item.boughtDate))/86400000)) : null;
   const templates = [];
   if(item.score >= 8.5){
@@ -1534,9 +1571,9 @@ function groupGraveyardByEntry(graveList){
   const groups = {};
   const order = [];
   graveList.forEach(item => {
-    const key = item.entryId;
+    const key = `${item.brand}|${item.name}|${item.flavor}`;
     if(!groups[key]){
-      groups[key] = { entryId: key, name: item.name, brand: item.brand, score: item.score, items: [] };
+      groups[key] = { entryId: item.entryId, name: item.name, brand: item.brand, flavor: item.flavor, score: item.score, items: [] };
       order.push(key);
     }
     groups[key].items.push(item);
@@ -1942,9 +1979,15 @@ function openDetailPanel(id){
       ${getPurchases(e).map(p => `
         <div class="purchase-row" data-pid="${p.id}">
           <div class="purchase-row-dates">
-            <input type="date" data-field="boughtDate" value="${p.boughtDate||''}">
+            <div class="purchase-date-field">
+              <input type="${isMonthOnly(p.boughtDate)?'month':'date'}" data-field="boughtDate" value="${p.boughtDate||''}">
+              <button type="button" class="date-precision-toggle" data-field="boughtDate">${isMonthOnly(p.boughtDate)?'精确到天':'只知道月份'}</button>
+            </div>
             <span class="purchase-arrow">→</span>
-            <input type="date" data-field="finishedDate" value="${p.finishedDate||''}" ${p.finishedDate?'':'disabled'}>
+            <div class="purchase-date-field">
+              <input type="${isMonthOnly(p.finishedDate)?'month':'date'}" data-field="finishedDate" value="${p.finishedDate||''}" ${p.finishedDate?'':'disabled'}>
+              <button type="button" class="date-precision-toggle" data-field="finishedDate" ${p.finishedDate?'':'disabled'}>${isMonthOnly(p.finishedDate)?'精确到天':'只知道月份'}</button>
+            </div>
           </div>
           <input type="text" class="epitaph-input" data-field="epitaph" value="${escapeHtml(p.epitaph||'')}" placeholder="留一句遗言（选填）" style="margin-bottom:6px;" ${p.finishedDate?'':'disabled'}>
           <div class="purchase-row-actions">
@@ -1982,18 +2025,38 @@ function openDetailPanel(id){
     btn.addEventListener('click', ()=>{
       const row = btn.closest('.purchase-row');
       const finishedInput = row.querySelector('input[data-field="finishedDate"]');
+      const finishedToggle = row.querySelector('.date-precision-toggle[data-field="finishedDate"]');
       const epitaphInput = row.querySelector('.epitaph-input');
       if(finishedInput.disabled){
         finishedInput.disabled = false;
+        finishedInput.type = 'date';
         finishedInput.value = new Date().toISOString().slice(0,10);
+        finishedToggle.disabled = false;
+        finishedToggle.textContent = '只知道月份';
         epitaphInput.disabled = false;
         btn.textContent = '撤销标记';
       }else{
         finishedInput.disabled = true;
         finishedInput.value = '';
+        finishedToggle.disabled = true;
         epitaphInput.disabled = true;
         epitaphInput.value = '';
         btn.textContent = '标记抽完';
+      }
+    });
+  });
+  panel.querySelectorAll('.date-precision-toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const row = btn.closest('.purchase-row');
+      const input = row.querySelector(`input[data-field="${btn.dataset.field}"]`);
+      if(input.type === 'date'){
+        input.type = 'month';
+        if(isFullDate(input.value)) input.value = input.value.slice(0,7);
+        btn.textContent = '精确到天';
+      }else{
+        input.type = 'date';
+        input.value = '';
+        btn.textContent = '只知道月份';
       }
     });
   });
@@ -2701,12 +2764,23 @@ function openGraveDetailView(group, allGroups){
         <div class="tombstone-full-meta">${group.brand?escapeHtml(group.brand)+' · ':''}共 ${group.items.length} 根</div>
         <div class="tombstone-divider"></div>
         <div class="tombstone-entries">
-          ${sortedItems.map(item => `
+          ${sortedItems.map(item => {
+            const precise = isFullDate(item.boughtDate) && isFullDate(item.finishedDate);
+            if(precise){
+              return `
             <div class="tombstone-entry">
-              <div class="tombstone-entry-date">${item.boughtDate||'日期不明'} → ${item.finishedDate}</div>
+              <div class="tombstone-entry-date">${formatFuzzyDate(item.boughtDate)} → ${formatFuzzyDate(item.finishedDate)}</div>
               ${item.epitaph ? `<div class="tombstone-entry-epitaph">"${escapeHtml(item.epitaph)}"</div>` : ''}
               <div class="tombstone-entry-eulogy">${eulogyText(item)}</div>
-            </div>`).join('')}
+            </div>`;
+            }
+            return `
+            <div class="tombstone-entry tombstone-entry-unknown">
+              <div class="tombstone-entry-date">${escapeHtml(unknownDateLine(item.purchaseId))}</div>
+              ${item.epitaph ? `<div class="tombstone-entry-epitaph">"${escapeHtml(item.epitaph)}"</div>` : ''}
+              <div class="tombstone-entry-eulogy">${eulogyText(item)}</div>
+            </div>`;
+          }).join('')}
         </div>
       </div>
     </div>
