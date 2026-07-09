@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -1058,18 +1058,51 @@ select.sort-select{
 .purchase-row .epitaph-input:disabled{opacity:0.4;background:var(--line);}
 .purchase-arrow{color:var(--muted);flex:none;}
 
-.grave-list{display:flex;flex-direction:column;gap:10px;}
-.grave-card{
+.tombstone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px;}
+.tombstone-mini{
   background:var(--glass-bg);
   backdrop-filter:blur(var(--glass-blur));
   -webkit-backdrop-filter:blur(var(--glass-blur));
-  border:1px solid var(--glass-border);
-  border-radius:14px;padding:14px 16px;
+  border:1.2px solid var(--glass-border);
+  border-radius:50% 50% 4px 4px / 46px 46px 4px 4px;
+  padding:28px 10px 14px;
+  cursor:pointer;
+  text-align:center;
+  transition:transform .15s ease;
 }
-.grave-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:2px;}
-.grave-meta{font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
-.grave-eulogy{font-size:13px;line-height:1.6;color:var(--ink);}
-.grave-eulogy .eulogy-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-right:6px;font-weight:700;}
+.tombstone-mini:hover{transform:translateY(-2px);}
+.tombstone-cross{display:block;margin:0 auto 10px;color:#8A4468;}
+[data-theme="dark"] .tombstone-cross{color:#D97DB0;}
+.tombstone-mini-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--ink);}
+.tombstone-mini-count{font-size:9.5px;color:#3A6954;font-family:'IBM Plex Mono',monospace;margin-top:3px;}
+[data-theme="dark"] .tombstone-mini-count{color:#A8DFC5;}
+
+.tombstone-full{
+  max-width:260px;width:100%;
+  background:var(--glass-bg);
+  backdrop-filter:blur(var(--glass-blur));
+  -webkit-backdrop-filter:blur(var(--glass-blur));
+  border:1.5px solid var(--glass-border);
+  border-radius:50% 50% 5px 5px / 80px 80px 5px 5px;
+  padding:50px 22px 26px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.tombstone-cross-big{display:block;margin:0 auto 6px;color:#8A4468;}
+[data-theme="dark"] .tombstone-cross-big{color:#D97DB0;}
+.tombstone-rip{
+  text-align:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;
+  letter-spacing:0.15em;font-weight:700;color:#8A4468;margin:0 0 18px;
+}
+[data-theme="dark"] .tombstone-rip{color:#D97DB0;}
+.tombstone-full-name{text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--ink);margin:0 0 2px;}
+.tombstone-full-meta{text-align:center;font-size:10.5px;color:#3A6954;font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;margin:0 0 16px;}
+[data-theme="dark"] .tombstone-full-meta{color:#A8DFC5;}
+.tombstone-divider{height:1px;background:repeating-linear-gradient(90deg,var(--glass-border) 0,var(--glass-border) 3px,transparent 3px,transparent 7px);margin:0 0 16px;}
+.tombstone-entries{display:flex;flex-direction:column;gap:14px;}
+.tombstone-entry-date{font-size:10.5px;color:#3A6954;font-family:'IBM Plex Mono',monospace;text-align:center;letter-spacing:0.03em;margin:0 0 4px;}
+[data-theme="dark"] .tombstone-entry-date{color:#A8DFC5;}
+.tombstone-entry-epitaph{font-size:12px;color:var(--ink);text-align:center;font-style:italic;margin:0 0 4px;line-height:1.5;}
+.tombstone-entry-eulogy{font-size:11.5px;color:var(--ink);text-align:center;font-style:italic;line-height:1.5;opacity:0.85;}
 
 .timeline-wrap{position:relative;padding-left:4px;}
 .timeline-line{position:absolute;left:20px;top:0;bottom:0;width:1px;background:var(--line);}
@@ -1117,7 +1150,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -1495,6 +1528,21 @@ function eulogyText(item){
   const idx = Math.abs(hash) % templates.length;
   return templates[idx];
 }
+
+function groupGraveyardByEntry(graveList){
+  const groups = {};
+  const order = [];
+  graveList.forEach(item => {
+    const key = item.entryId;
+    if(!groups[key]){
+      groups[key] = { entryId: key, name: item.name, brand: item.brand, score: item.score, items: [] };
+      order.push(key);
+    }
+    groups[key].items.push(item);
+  });
+  return order.map(key => groups[key]);
+}
+
 
 /* ---------- local config (device settings only: nickname + room codes) ---------- */
 function loadConfig(){
@@ -2571,19 +2619,19 @@ async function openTimelinePanel(){
 async function openGraveyardPanel(){
   const personalEntries = await getPersonalEntriesForAchievements();
   const grave = getGraveyardEntries(personalEntries);
+  const groups = groupGraveyardByEntry(grave);
   panel.innerHTML = `
     <div class="panel-head">
       <h2>纪念馆</h2>
       <div class="close-btn" id="closePanel">✕</div>
     </div>
-    ${grave.length ? `
-    <div class="grave-list">
-      ${grave.map(item => `
-        <div class="grave-card">
-          <div class="grave-name">${escapeHtml(item.name)}${item.brand?' · '+escapeHtml(item.brand):''}</div>
-          <div class="grave-meta">${item.boughtDate||'日期不明'} → ${item.finishedDate} · 综合 ${item.score.toFixed(1)}</div>
-          ${item.epitaph ? `<div class="grave-eulogy" style="font-style:italic;margin-bottom:6px;">"${escapeHtml(item.epitaph)}"</div>` : ''}
-          <div class="grave-eulogy">${eulogyText(item)}</div>
+    ${groups.length ? `
+    <div class="tombstone-grid">
+      ${groups.map(g => `
+        <div class="tombstone-mini" data-entry-id="${g.entryId}">
+          <svg class="tombstone-cross" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3v18"/><path d="M7 8.5h10"/></svg>
+          <div class="tombstone-mini-name">${escapeHtml(g.name)}</div>
+          <div class="tombstone-mini-count">共 ${g.items.length} 根</div>
         </div>`).join('')}
     </div>` : `
     <div class="empty">
@@ -2594,6 +2642,42 @@ async function openGraveyardPanel(){
   `;
   overlay.classList.add('open');
   document.getElementById('closePanel').addEventListener('click', closePanel);
+  panel.querySelectorAll('.tombstone-mini').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const g = groups.find(x=>String(x.entryId)===el.dataset.entryId);
+      if(g) openGraveDetailView(g, groups);
+    });
+  });
+}
+
+function openGraveDetailView(group, allGroups){
+  const sortedItems = [...group.items].sort((a,b)=> new Date(b.finishedDate) - new Date(a.finishedDate));
+  panel.innerHTML = `
+    <div class="panel-head">
+      <h2>纪念馆</h2>
+      <div class="close-btn" id="closePanel">✕</div>
+    </div>
+    <button type="button" class="mini-btn" id="graveBackBtn" style="margin-bottom:16px;">← 返回</button>
+    <div style="display:flex;justify-content:center;">
+      <div class="tombstone-full">
+        <svg class="tombstone-cross-big" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3v18"/><path d="M7 8.5h10"/></svg>
+        <div class="tombstone-rip">R . I . P .</div>
+        <div class="tombstone-full-name">${escapeHtml(group.name)}</div>
+        <div class="tombstone-full-meta">${group.brand?escapeHtml(group.brand)+' · ':''}共 ${group.items.length} 根</div>
+        <div class="tombstone-divider"></div>
+        <div class="tombstone-entries">
+          ${sortedItems.map(item => `
+            <div class="tombstone-entry">
+              <div class="tombstone-entry-date">${item.boughtDate||'日期不明'} → ${item.finishedDate}</div>
+              ${item.epitaph ? `<div class="tombstone-entry-epitaph">"${escapeHtml(item.epitaph)}"</div>` : ''}
+              <div class="tombstone-entry-eulogy">${eulogyText(item)}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('closePanel').addEventListener('click', closePanel);
+  document.getElementById('graveBackBtn').addEventListener('click', ()=> openGraveyardPanel());
 }
 const ACHIEVEMENTS = [
   { id:'starter', title:'[博学多闻] 你的舌头开始记笔记了', icon:'📔', desc:'测评满 10 款',
