@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -1151,7 +1151,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -1561,6 +1561,32 @@ function currentRoomCode(){
   return activeRoom === 'personal' ? config.personalCode : config.groupCode;
 }
 
+function checkNewLikes(entriesList){
+  if(!config.nickname) return;
+  const raw = localStorage.getItem('vape-seen-likes');
+  let seen = null;
+  try{ seen = raw ? JSON.parse(raw) : null; }catch(e){ seen = null; }
+  const isFirstRun = seen === null;
+  if(isFirstRun) seen = {};
+  const notifications = [];
+  entriesList.forEach(e=>{
+    if(e.author !== config.nickname) return;
+    const likes = e.likes || [];
+    const seenForThis = seen[e.id] || [];
+    if(!isFirstRun){
+      likes.filter(n => n !== config.nickname && !seenForThis.includes(n))
+        .forEach(n => notifications.push({ liker: n, entryName: e.name || '未命名' }));
+    }
+    seen[e.id] = likes.slice();
+  });
+  try{ localStorage.setItem('vape-seen-likes', JSON.stringify(seen)); }catch(e){}
+  if(notifications.length === 1){
+    showToast(`${notifications[0].liker} 点赞了你的《${notifications[0].entryName}》`);
+  }else if(notifications.length > 1){
+    showToast(`收到 ${notifications.length} 个新点赞`);
+  }
+}
+
 /* ---------- cloud storage (Supabase) ---------- */
 async function loadEntries(){
   const code = currentRoomCode();
@@ -1580,6 +1606,10 @@ async function loadEntries(){
     entries = allRows.filter(e => !e.__membership);
     if(activeRoom === 'personal'){
       checkAndShowNewAchievements(entries);
+      checkAndShowNewTitles(entries);
+    }
+    if(activeRoom === 'shared'){
+      checkNewLikes(entries);
     }
   }catch(e){
     showToast('加载失败：' + (e.message || '网络问题'));
@@ -2268,9 +2298,13 @@ function renderForm(data, title){
       render();
       if(activeRoom === 'personal'){
         if(isNewEntry){
-          setTimeout(()=> checkAndShowNewAchievements(entries), 2500);
+          setTimeout(()=>{
+            checkAndShowNewAchievements(entries);
+            checkAndShowNewTitles(entries);
+          }, 2500);
         }else{
           checkAndShowNewAchievements(entries);
+          checkAndShowNewTitles(entries);
         }
       }
       showToast(editingId ? '已保存修改' : '已添加新记录');
@@ -2814,6 +2848,46 @@ function checkAndShowNewAchievements(personalEntries){
   }
 }
 
+const TITLE_FLAVORS = {
+  '[薄荷神经元]': '冰感已经刻进了你的神经回路。',
+  '[肺活量崇拜]': '烟雾越大，越像是某种宣言。',
+  '[无摩擦主义者]': '顺滑到没有一丝阻力，连怀疑都被抹平了。',
+  '[痛觉爱好者]': '没有刺激感，就好像什么都没发生过。',
+  '[审判官人格]': '你打分从不留情面。',
+  '[无差别赐福]': '在你眼里，好像什么都值得原谅。',
+  '[单一信仰]': '你早就不装了，你就是喜欢它。',
+  '[数据殖民者]': '记录本身，成了另一种上瘾。',
+  '[夜行观察者]': '深夜写测评的人，总有点故事。'
+};
+function getUnlockedTitleNames(){
+  try{
+    const raw = localStorage.getItem('vape-unlocked-titles');
+    return raw === null ? null : JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function saveUnlockedTitleNames(names){
+  try{ localStorage.setItem('vape-unlocked-titles', JSON.stringify(names)); }catch(e){}
+}
+function checkAndShowNewTitles(personalEntries){
+  const currentTitles = getTitles(personalEntries);
+  const stored = getUnlockedTitleNames();
+  if(stored === null){
+    saveUnlockedTitleNames(currentTitles);
+    return;
+  }
+  const newTitles = currentTitles.filter(t => !stored.includes(t));
+  if(newTitles.length){
+    const merged = Array.from(new Set([...stored, ...currentTitles]));
+    saveUnlockedTitleNames(merged);
+    newTitles.forEach(t => achvQueue.push({
+      title: t,
+      flavor: TITLE_FLAVORS[t] || '你身上的某种气质，被系统注意到了。',
+      eyebrowText: '称 号 解 锁'
+    }));
+    showNextAchvModal();
+  }
+}
+
 function formatAchvTitle(title){
   const m = title.match(/^(\[[^\]]+\])\s*(.*)$/);
   if(!m) return escapeHtml(title);
@@ -2839,7 +2913,7 @@ function showNextAchvModal(){
       <div class="recap-scanlines"></div>
       <div class="recap-bracket tl"></div>
       <div class="recap-bracket br"></div>
-      <div class="achv-modal-eyebrow">成 就 解 锁</div>
+      <div class="achv-modal-eyebrow">${a.eyebrowText || '成 就 解 锁'}</div>
       <div class="achv-modal-title">${formatAchvTitle(a.title)}</div>
       <div class="achv-modal-desc">${a.flavor || ''}</div>
       <div class="achv-modal-actions">
@@ -2873,7 +2947,7 @@ async function exportAchvImage(a){
   card.innerHTML = `
     <div class="achv-export-bracket tl"></div>
     <div class="achv-export-bracket br"></div>
-    <div class="achv-export-eyebrow">成 就 解 锁</div>
+    <div class="achv-export-eyebrow">${a.eyebrowText || '成 就 解 锁'}</div>
     ${formatAchvExportTitle(a.title)}
     ${a.flavor ? `<div class="achv-export-desc">${escapeHtml(a.flavor)}</div>` : ''}
     <div class="achv-export-footer">仿生人会梦见电子烟吗</div>
