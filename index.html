@@ -1537,7 +1537,14 @@ const UNKNOWN_DATE_LINES = [
   '[无名冢] 记忆里空了一块',
   '[无名冢] 时间在这里打了个哈欠',
   '[无名冢] 日子被弄丢了',
-  '[无名冢] 这一段，谁都想不起来'
+  '[无名冢] 这一段，谁都想不起来',
+  '[无名冢] 连日历都保持沉默',
+  '[无名冢] 那几天，好像从没存在过',
+  '[无名冢] 记录这件事，本身也被遗忘了',
+  '[无名冢] 说不清是哪天，只知道抽过',
+  '[无名冢] 那天的太阳，没留下证据',
+  '[无名冢] 只有肺记得，脑子选择性失忆',
+  '[无名冢] 缺了一角的记忆，拼不回去了'
 ];
 function unknownDateLine(purchaseId){
   let hash = 0;
@@ -2765,8 +2772,8 @@ function openGraveDetailView(group, allGroups){
         <div class="tombstone-divider"></div>
         <div class="tombstone-entries">
           ${sortedItems.map(item => {
-            const precise = isFullDate(item.boughtDate) && isFullDate(item.finishedDate);
-            if(precise){
+            const hasSomeInfo = (isFullDate(item.boughtDate) || isMonthOnly(item.boughtDate)) && (isFullDate(item.finishedDate) || isMonthOnly(item.finishedDate));
+            if(hasSomeInfo){
               return `
             <div class="tombstone-entry">
               <div class="tombstone-entry-date">${formatFuzzyDate(item.boughtDate)} → ${formatFuzzyDate(item.finishedDate)}</div>
