@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -166,6 +166,21 @@ h1.title{
   margin-bottom:18px;
   box-shadow:var(--shadow);
 }
+.member-list{
+  flex-basis:100%;
+  display:flex;flex-wrap:wrap;gap:8px;
+  padding-top:10px;margin-top:2px;
+  border-top:1px solid var(--line);
+}
+.member-row{
+  display:flex;align-items:center;gap:6px;
+  background:var(--paper-soft);
+  border-radius:999px;
+  padding:5px 10px;
+  font-size:12.5px;
+}
+.member-name{font-weight:600;color:var(--ink);}
+.member-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--sage);}
 .stat{display:flex;flex-direction:column;gap:2px;}
 .stat .num{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
 .stat .lbl{font-size:11.5px;color:var(--muted);}
@@ -1102,7 +1117,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -1159,6 +1174,7 @@ const SUPABASE_KEY = 'sb_publishable_1lLLhR94YW3sxhjqEnf3Wg_8IzZvKQU';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let entries = [];
+let roomMembers = [];
 let activeTag = null;
 let editingId = null;
 let pendingPhoto = null;
@@ -1499,28 +1515,51 @@ function currentRoomCode(){
 /* ---------- cloud storage (Supabase) ---------- */
 async function loadEntries(){
   const code = currentRoomCode();
-  if(!code){ entries = []; render(); return; }
+  if(!code){ entries = []; roomMembers = []; render(); return; }
   isLoading = true;
   render();
   try{
     const { data, error } = await sb.from('entries').select('*').eq('room_code', code).order('created_at', { ascending:false });
     if(error) throw error;
-    entries = (data||[]).map(row => ({
+    const allRows = (data||[]).map(row => ({
       ...row.data,
       id: row.id,
       author: row.author,
       createdAt: new Date(row.created_at).getTime()
     }));
-    console.log('[购入调试] 重新加载后，各条记录的 purchases:', entries.map(x=>({name:x.name, purchases:x.purchases||null, purchaseCount:x.purchaseCount})));
+    roomMembers = allRows;
+    entries = allRows.filter(e => !e.__membership);
     if(activeRoom === 'personal'){
       checkAndShowNewAchievements(entries);
     }
   }catch(e){
     showToast('加载失败：' + (e.message || '网络问题'));
     entries = [];
+    roomMembers = [];
   }
   isLoading = false;
   render();
+}
+
+async function ensureMembershipMarker(){
+  if(!config.groupCode || !config.nickname) return;
+  try{
+    const { data, error } = await sb.from('entries')
+      .select('id')
+      .eq('room_code', config.groupCode)
+      .eq('author', config.nickname)
+      .contains('data', { __membership: true })
+      .limit(1);
+    if(error) throw error;
+    if(data && data.length) return;
+    await sb.from('entries').insert({
+      room_code: config.groupCode,
+      author: config.nickname,
+      data: { __membership: true }
+    });
+  }catch(e){
+    console.log('[成员标记] 写入失败:', e);
+  }
 }
 
 async function insertEntry(entryData){
@@ -1574,6 +1613,19 @@ function compressImage(file){
 }
 
 /* ---------- stats / tabs / tags ---------- */
+let memberListExpanded = false;
+function getMemberList(entriesList){
+  const byAuthor = {};
+  entriesList.forEach(e=>{
+    if(!e.author) return;
+    if(!byAuthor[e.author] || (e.createdAt||0) > (byAuthor[e.author].createdAt||0)){
+      byAuthor[e.author] = e;
+    }
+  });
+  return Object.keys(byAuthor).sort((a,b)=>a.localeCompare(b,'zh')).map(name => ({
+    name, title: byAuthor[name].authorTitle || null
+  }));
+}
 function renderStats(){
   const count = entries.length;
   const avg = count ? (entries.reduce((s,e)=>s+e.score,0)/count).toFixed(1) : '–';
@@ -1583,14 +1635,23 @@ function renderStats(){
     return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
   }).length;
   const memberCount = activeRoom === 'shared'
-    ? new Set(entries.map(e=>e.author).filter(Boolean)).size
+    ? new Set(roomMembers.map(e=>e.author).filter(Boolean)).size
     : null;
+  const members = memberCount !== null ? getMemberList(roomMembers) : [];
   statStrip.innerHTML = `
     <div class="stat"><span class="num">${count}</span><span class="lbl">已记录款数</span></div>
     <div class="stat"><span class="num">${avg}</span><span class="lbl">平均评分</span></div>
     <div class="stat"><span class="num">${monthCount}</span><span class="lbl">本月新增</span></div>
-    ${memberCount !== null ? `<div class="stat"><span class="num">${memberCount}</span><span class="lbl">位成员</span></div>` : ''}
+    ${memberCount !== null ? `<div class="stat" id="memberStat" style="cursor:pointer;"><span class="num">${memberCount}</span><span class="lbl">位成员 ${memberListExpanded?'▴':'▾'}</span></div>` : ''}
+    ${memberCount !== null && memberListExpanded ? `<div class="member-list">${members.map(m=>`<div class="member-row"><span class="member-name">${escapeHtml(m.name)}</span>${m.title?`<span class="member-title">${escapeHtml(m.title)}</span>`:''}</div>`).join('')}</div>` : ''}
   `;
+  const memberStat = document.getElementById('memberStat');
+  if(memberStat){
+    memberStat.addEventListener('click', ()=>{
+      memberListExpanded = !memberListExpanded;
+      renderStats();
+    });
+  }
 }
 
 function renderTabs(){
@@ -2236,6 +2297,7 @@ async function renderSettingsForm(isFirstRun){
     saveConfig();
     closePanel();
     activeTag = null;
+    if(config.groupCode) ensureMembershipMarker();
     await loadEntries();
     showToast('设置已保存');
   });
@@ -2754,7 +2816,7 @@ async function getPersonalEntriesForAchievements(){
   try{
     const { data, error } = await sb.from('entries').select('*').eq('room_code', config.personalCode);
     if(error) throw error;
-    return (data||[]).map(row => ({...row.data, id: row.id, author: row.author, createdAt: new Date(row.created_at).getTime()}));
+    return (data||[]).map(row => ({...row.data, id: row.id, author: row.author, createdAt: new Date(row.created_at).getTime()})).filter(e => !e.__membership);
   }catch(e){
     showToast('加载成就数据失败：' + (e.message || '网络问题'));
     return [];
