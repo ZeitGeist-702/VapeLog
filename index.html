@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -1174,7 +1174,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -1482,6 +1482,12 @@ function formatFuzzyDate(str){
   return str;
 }
 
+function isPurchaseFinished(p){
+  if(p.finished === true) return true;
+  if(p.finished === false) return false;
+  return !!p.finishedDate;
+}
+
 function getPurchases(e){
   if(Array.isArray(e.purchases)) return e.purchases;
   const count = e.purchaseCount || 1;
@@ -1517,10 +1523,10 @@ async function addNewPurchase(e){
   await savePurchases(e, purchases, '已记录新的一根');
 }
 
-async function saveRowPurchase(id, pid, boughtDate, finishedDate, epitaph){
+async function saveRowPurchase(id, pid, boughtDate, finishedDate, epitaph, finished){
   const e = entries.find(x=>String(x.id)===String(id));
   if(!e) return;
-  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, boughtDate, finishedDate, epitaph: epitaph||''} : {...p});
+  const purchases = getPurchases(e).map(p=> p.id===pid ? {...p, boughtDate, finishedDate, epitaph: epitaph||'', finished} : {...p});
   await savePurchases(e, purchases, '已保存');
 }
 
@@ -1529,7 +1535,7 @@ function getGraveyardEntries(entriesList){
   const list = [];
   entriesList.forEach(e=>{
     getPurchases(e).forEach(p=>{
-      if(p.finishedDate){
+      if(isPurchaseFinished(p)){
         list.push({
           purchaseId: p.id, entryId: e.id, name: e.name||'未命名', brand: e.brand||'', flavor: e.flavor||'',
           score: Number(e.score)||0, boughtDate: p.boughtDate||'', finishedDate: p.finishedDate,
@@ -1992,7 +1998,7 @@ function openDetailPanel(id){
         <span>购入记录</span>
         <button type="button" class="mini-btn" id="addPurchaseBtn">+ 新的一根</button>
       </div>
-      ${getPurchases(e).map(p => `
+      ${getPurchases(e).map(p => { const finished = isPurchaseFinished(p); return `
         <div class="purchase-row" data-pid="${p.id}">
           <div class="purchase-row-dates">
             <div class="purchase-date-field">
@@ -2004,19 +2010,19 @@ function openDetailPanel(id){
             </div>
             <span class="purchase-arrow">→</span>
             <div class="purchase-date-field">
-              <input type="${isMonthOnly(p.finishedDate)?'month':'date'}" data-field="finishedDate" value="${p.finishedDate||''}" ${p.finishedDate?'':'disabled'}>
+              <input type="${isMonthOnly(p.finishedDate)?'month':'date'}" data-field="finishedDate" value="${p.finishedDate||''}" ${finished?'':'disabled'}>
               <div class="date-field-actions">
-                <button type="button" class="date-precision-toggle" data-field="finishedDate" ${p.finishedDate?'':'disabled'}>${isMonthOnly(p.finishedDate)?'精确到天':'只知道月份'}</button>
-                <button type="button" class="date-clear-btn" data-field="finishedDate" ${p.finishedDate?'':'disabled'}>清空</button>
+                <button type="button" class="date-precision-toggle" data-field="finishedDate" ${finished?'':'disabled'}>${isMonthOnly(p.finishedDate)?'精确到天':'只知道月份'}</button>
+                <button type="button" class="date-clear-btn" data-field="finishedDate" ${finished?'':'disabled'}>清空</button>
               </div>
             </div>
           </div>
-          <input type="text" class="epitaph-input" data-field="epitaph" value="${escapeHtml(p.epitaph||'')}" placeholder="留一句遗言（选填）" style="margin-bottom:6px;" ${p.finishedDate?'':'disabled'}>
+          <input type="text" class="epitaph-input" data-field="epitaph" value="${escapeHtml(p.epitaph||'')}" placeholder="留一句遗言（选填）" style="margin-bottom:6px;" ${finished?'':'disabled'}>
           <div class="purchase-row-actions">
-            <button type="button" class="mini-btn toggle-finish-btn" data-pid="${p.id}">${p.finishedDate?'撤销标记':'标记抽完'}</button>
+            <button type="button" class="mini-btn toggle-finish-btn" data-pid="${p.id}" data-finished="${finished}">${finished?'撤销标记':'标记抽完'}</button>
             <button type="button" class="mini-btn save-row-btn" data-pid="${p.id}">保存</button>
           </div>
-        </div>`).join('')}
+        </div>`; }).join('')}
     </div>` : ''}
     <div style="display:flex;gap:8px;margin-bottom:14px;">
       <button type="button" class="photo-btn" id="exportCardBtn" style="flex:1;">生成分享卡</button>
@@ -2050,7 +2056,8 @@ function openDetailPanel(id){
       const finishedToggle = row.querySelector('.date-precision-toggle[data-field="finishedDate"]');
       const finishedClear = row.querySelector('.date-clear-btn[data-field="finishedDate"]');
       const epitaphInput = row.querySelector('.epitaph-input');
-      if(finishedInput.disabled){
+      const currentlyFinished = btn.dataset.finished === 'true';
+      if(!currentlyFinished){
         finishedInput.disabled = false;
         finishedInput.type = 'date';
         finishedInput.value = new Date().toISOString().slice(0,10);
@@ -2059,6 +2066,7 @@ function openDetailPanel(id){
         finishedClear.disabled = false;
         epitaphInput.disabled = false;
         btn.textContent = '撤销标记';
+        btn.dataset.finished = 'true';
       }else{
         finishedInput.disabled = true;
         finishedInput.value = '';
@@ -2067,6 +2075,7 @@ function openDetailPanel(id){
         epitaphInput.disabled = true;
         epitaphInput.value = '';
         btn.textContent = '标记抽完';
+        btn.dataset.finished = 'false';
       }
     });
   });
@@ -2098,10 +2107,12 @@ function openDetailPanel(id){
       const pid = row.dataset.pid;
       const boughtDate = row.querySelector('input[data-field="boughtDate"]').value;
       const finishedInput = row.querySelector('input[data-field="finishedDate"]');
-      const finishedDate = finishedInput.disabled ? null : (finishedInput.value || null);
+      const finishToggleBtn = row.querySelector('.toggle-finish-btn');
+      const finished = finishToggleBtn.dataset.finished === 'true';
+      const finishedDate = finished ? (finishedInput.value || null) : null;
       const epitaphInput = row.querySelector('.epitaph-input');
-      const epitaph = finishedInput.disabled ? '' : epitaphInput.value.trim();
-      saveRowPurchase(e.id, pid, boughtDate, finishedDate, epitaph);
+      const epitaph = finished ? epitaphInput.value.trim() : '';
+      saveRowPurchase(e.id, pid, boughtDate, finishedDate, epitaph, finished);
     });
   });
 }
