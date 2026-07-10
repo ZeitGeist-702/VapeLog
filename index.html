@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -1042,20 +1042,29 @@ select.sort-select{
 }
 .purchase-row-dates{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .purchase-date-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.date-field-actions{display:flex;gap:4px;}
 .date-precision-toggle{
-  font-family:'IBM Plex Mono',monospace;font-size:9.5px;
-  background:none;border:none;color:var(--muted);
-  cursor:pointer;text-decoration:underline;padding:0;text-align:left;
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;
+  background:var(--paper-soft);border:1px solid var(--line);border-radius:999px;
+  color:var(--muted);cursor:pointer;padding:2px 7px;text-align:center;
 }
-.date-precision-toggle:disabled{opacity:0.4;cursor:default;text-decoration:none;}
+.date-precision-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.date-precision-toggle:disabled{opacity:0.4;cursor:default;}
+.date-clear-btn{
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;
+  background:var(--paper-soft);border:1px solid var(--line);border-radius:999px;
+  color:var(--muted);cursor:pointer;padding:2px 7px;text-align:center;
+}
+.date-clear-btn:hover{border-color:var(--danger);color:var(--danger);}
+.date-clear-btn:disabled{opacity:0.4;cursor:default;}
 .purchase-row-actions{display:flex;justify-content:flex-end;gap:6px;}
-.purchase-row input[type="date"]{
+.purchase-row input[type="date"], .purchase-row input[type="month"]{
   font-family:'IBM Plex Mono',monospace;font-size:12px;
   border:1px solid var(--line);border-radius:6px;
   background:var(--paper);color:var(--ink);
   padding:4px 6px;flex:1;min-width:0;
 }
-.purchase-row input[type="date"]:disabled{opacity:0.4;background:var(--line);}
+.purchase-row input[type="date"]:disabled, .purchase-row input[type="month"]:disabled{opacity:0.4;background:var(--line);}
 .purchase-row .epitaph-input{
   width:100%;font-family:'Inter',sans-serif;font-size:12px;
   border:1px solid var(--line);border-radius:6px;
@@ -1165,7 +1174,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -1988,12 +1997,18 @@ function openDetailPanel(id){
           <div class="purchase-row-dates">
             <div class="purchase-date-field">
               <input type="${isMonthOnly(p.boughtDate)?'month':'date'}" data-field="boughtDate" value="${p.boughtDate||''}">
-              <button type="button" class="date-precision-toggle" data-field="boughtDate">${isMonthOnly(p.boughtDate)?'精确到天':'只知道月份'}</button>
+              <div class="date-field-actions">
+                <button type="button" class="date-precision-toggle" data-field="boughtDate">${isMonthOnly(p.boughtDate)?'精确到天':'只知道月份'}</button>
+                <button type="button" class="date-clear-btn" data-field="boughtDate">清空</button>
+              </div>
             </div>
             <span class="purchase-arrow">→</span>
             <div class="purchase-date-field">
               <input type="${isMonthOnly(p.finishedDate)?'month':'date'}" data-field="finishedDate" value="${p.finishedDate||''}" ${p.finishedDate?'':'disabled'}>
-              <button type="button" class="date-precision-toggle" data-field="finishedDate" ${p.finishedDate?'':'disabled'}>${isMonthOnly(p.finishedDate)?'精确到天':'只知道月份'}</button>
+              <div class="date-field-actions">
+                <button type="button" class="date-precision-toggle" data-field="finishedDate" ${p.finishedDate?'':'disabled'}>${isMonthOnly(p.finishedDate)?'精确到天':'只知道月份'}</button>
+                <button type="button" class="date-clear-btn" data-field="finishedDate" ${p.finishedDate?'':'disabled'}>清空</button>
+              </div>
             </div>
           </div>
           <input type="text" class="epitaph-input" data-field="epitaph" value="${escapeHtml(p.epitaph||'')}" placeholder="留一句遗言（选填）" style="margin-bottom:6px;" ${p.finishedDate?'':'disabled'}>
@@ -2033,6 +2048,7 @@ function openDetailPanel(id){
       const row = btn.closest('.purchase-row');
       const finishedInput = row.querySelector('input[data-field="finishedDate"]');
       const finishedToggle = row.querySelector('.date-precision-toggle[data-field="finishedDate"]');
+      const finishedClear = row.querySelector('.date-clear-btn[data-field="finishedDate"]');
       const epitaphInput = row.querySelector('.epitaph-input');
       if(finishedInput.disabled){
         finishedInput.disabled = false;
@@ -2040,12 +2056,14 @@ function openDetailPanel(id){
         finishedInput.value = new Date().toISOString().slice(0,10);
         finishedToggle.disabled = false;
         finishedToggle.textContent = '只知道月份';
+        finishedClear.disabled = false;
         epitaphInput.disabled = false;
         btn.textContent = '撤销标记';
       }else{
         finishedInput.disabled = true;
         finishedInput.value = '';
         finishedToggle.disabled = true;
+        finishedClear.disabled = true;
         epitaphInput.disabled = true;
         epitaphInput.value = '';
         btn.textContent = '标记抽完';
@@ -2065,6 +2083,13 @@ function openDetailPanel(id){
         input.value = '';
         btn.textContent = '只知道月份';
       }
+    });
+  });
+  panel.querySelectorAll('.date-clear-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const row = btn.closest('.purchase-row');
+      const input = row.querySelector(`input[data-field="${btn.dataset.field}"]`);
+      input.value = '';
     });
   });
   panel.querySelectorAll('.save-row-btn').forEach(btn=>{
