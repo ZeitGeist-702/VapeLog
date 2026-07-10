@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>仿生人会梦见电子烟吗</title>
+<title>测评手记</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="仿生人会梦见电子烟吗">
+<meta name="apple-mobile-web-app-title" content="测评手记">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -1174,7 +1174,7 @@ select.sort-select{
   <div class="header-row">
     <div>
       <div class="eyebrow">PERSONAL VAPOR LOG</div>
-      <h1 class="title">仿生人会梦见电子烟吗</h1>
+      <h1 class="title">测评手记</h1>
     </div>
     <div style="display:flex;gap:8px;">
       <div class="icon-btn" id="themeBtn" title="深色模式"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
@@ -1570,23 +1570,73 @@ function unknownDateLine(purchaseId){
 function eulogyText(item){
   const hasDays = isFullDate(item.boughtDate) && isFullDate(item.finishedDate);
   const days = hasDays ? Math.max(0, Math.round((new Date(item.finishedDate)-new Date(item.boughtDate))/86400000)) : null;
-  const templates = [];
-  if(item.score >= 8.5){
-    templates.push(`[灵魂共振] ${days!==null?`${days} 天里，`:''}它曾让某个深夜不那么难熬，直到最后一口散尽。`);
-  }else if(item.score < 5){
-    templates.push(`[古老的爬虫脑] 早该扔了对吧，可手指还是舍不得停下来。`);
-  }else{
-    templates.push(`[退役通知] 没成为传说，但成为了某几天的背景音。`);
+
+  const scoreLines = item.score >= 8.5 ? [
+    '[灵魂共振] 它曾让某个深夜不那么难熬，直到最后一口散尽。',
+    '[灵魂共振] 好烟总是走得比想象中快，这根也不例外。',
+    '[灵魂共振] 如果电子烟有灵魂，这根大概去了更好的地方。',
+    '[灵魂共振] 好东西总是先没的，这是宇宙的规矩。',
+    '[灵魂共振] 你舍不得，但它还是走了。',
+    '[灵魂共振] 有些满足感，只能靠告别来证明它存在过。',
+    '[灵魂共振] 它没留遗言，但表现说明了一切。'
+  ] : item.score < 5 ? [
+    '[古老的爬虫脑] 早该扔了对吧，可手指还是舍不得停下来。',
+    '[古老的爬虫脑] 明知道不好抽，还是抽到了最后一口。',
+    '[古老的爬虫脑] 这根烟教会你的唯一一件事：别再买同款了。',
+    '[古老的爬虫脑] 分数不高，抽得倒挺认真。',
+    '[古老的爬虫脑] 嘴上说着难抽，手却没停下来过。',
+    '[古老的爬虫脑] 连它自己可能都没想到会被抽完。',
+    '[古老的爬虫脑] 差评归差评，肺还是很诚实地接受了它。'
+  ] : [
+    '[退役通知] 没成为传说，但成为了某几天的背景音。',
+    '[退役通知] 平淡地开始，平淡地结束，谁都没觉得意外。',
+    '[退役通知] 它尽力了，只是没什么值得铭记的。',
+    '[退役通知] 不功不过，完成了它该完成的事。',
+    '[退役通知] 没人会为它写诗，但它确实存在过。',
+    '[退役通知] 它活成了一个不高不低的平均数。',
+    '[退役通知] 它没让你失望，也没让你惊喜。'
+  ];
+
+  const inlandLines = [
+    '[内陆帝国] 你知道自己迟早会再买同款的，这不是结束，是轮回。',
+    '[内陆帝国] 结束这件事，对你来说好像从来没真正发生过。',
+    '[内陆帝国] 下一根已经在路上了，这根只是先走一步。',
+    '[内陆帝国] 这套流程你已经很熟练了。',
+    '[内陆帝国] 你早就习惯了这种循环，习惯到不再难过。',
+    '[内陆帝国] 结束只是个说法，习惯从来没有真的结束过。',
+    '[内陆帝国] 它走了，但它的位置很快会有新的填上。'
+  ];
+
+  const withdrawalLines = [
+    '[戒断反射] 最后一口散尽的瞬间，手指还保持着按下的姿势。',
+    '[戒断反射] 身体比意识先反应过来——已经空了。',
+    '[戒断反射] 习惯性地又摸了一下口袋，才想起它已经不在了。',
+    '[戒断反射] 手比脑子诚实，还在下意识地找它。',
+    '[戒断反射] 空了之后，习惯性的那一下按压才最难改。',
+    '[戒断反射] 肌肉记忆比记忆本身活得更久。',
+    '[戒断反射] 明明知道没了，手指还是走了一遍流程。'
+  ];
+
+  const categories = [scoreLines, inlandLines, withdrawalLines];
+  if(days !== null){
+    categories.push([
+      `[遗物档案] 一共陪了 ${days} 天，没人统计过是不是值得。`,
+      `[遗物档案] ${days} 天，够长到记住，也够短到遗忘。`,
+      `[遗物档案] 第 ${days} 天，它先撑不住了。`,
+      `[遗物档案] 活了 ${days} 天，退休得悄无声息。`,
+      `[遗物档案] 撑了 ${days} 天，也没撑出什么意义。`,
+      `[遗物档案] ${days} 天，像任何一段平常的日子一样过去了。`,
+      `[遗物档案] 用了 ${days} 天才走完的流程，谁都懒得鼓掌。`
+    ]);
   }
-  templates.push(`[内陆帝国] 你知道自己迟早会再买同款的，这不是结束，是轮回。`);
-  if(days!==null){
-    templates.push(`[遗物档案] 从相遇到耗尽，一共 ${days} 天，喉咙记得每一天。`);
-  }
-  templates.push(`[戒断反射] 最后一口散尽的瞬间，手指还保持着按下的姿势。`);
-  let hash = 0;
-  for(const c of String(item.purchaseId)) hash = (hash*31 + c.charCodeAt(0)) | 0;
-  const idx = Math.abs(hash) % templates.length;
-  return templates[idx];
+
+  let hashA = 0;
+  for(const c of String(item.purchaseId)) hashA = (hashA*31 + c.charCodeAt(0)) | 0;
+  let hashB = 0;
+  for(const c of String(item.purchaseId)+'salt') hashB = (hashB*17 + c.charCodeAt(0)) | 0;
+
+  const chosenCategory = categories[Math.abs(hashA) % categories.length];
+  return chosenCategory[Math.abs(hashB) % chosenCategory.length];
 }
 
 function groupGraveyardByEntry(graveList){
